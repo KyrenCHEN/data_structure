@@ -258,7 +258,8 @@ footer code{background:var(--code-bg);padding:2px 6px;border-radius:5px;border:1
     <div class="pill-row">
       <span class="pill"><span class="dot"></span>Python 版 · Tkinter 图形界面</span>
       <span class="pill"><span class="dot c"></span>C 版 · dlopen 动态加载 + 文本菜单</span>
-      <span class="pill">示例插件：E1.3 汉诺塔（两版均含）</span>
+      <span class="pill">输入输出统一用纯文本</span>
+      <span class="pill">示例插件：E1 汉诺塔（两版均含）</span>
     </div>
   </div>
 </header>
@@ -344,10 +345,85 @@ footer code{background:var(--code-bg);padding:2px 6px;border-radius:5px;border:1
   </div>
 </section>
 
-<section id="quickstart">
+<section id="ui-layout">
   <div class="wrap">
     <div class="section-head">
       <span class="section-num">02</span>
+      <h2 class="section-title">Python 版界面长什么样</h2>
+    </div>
+    <p class="section-desc">
+      同一次课的插件放进同一个菜单；点开一个插件后，左侧出现说明和输入框；
+      中间是一个大大的纯文本输出框——不管算法多复杂，界面永远只有"一段文本进、一段文本出"。
+    </p>
+
+    <div class="diagram-card">
+      <svg viewBox="0 0 920 380" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="界面示意图：顶部菜单栏按实验分组，左侧是插件说明与输入框，中间是大输出框">
+        <style>
+          .win{fill:var(--surface);stroke:var(--border);stroke-width:1.4;}
+          .menubar{fill:var(--surface-2);stroke:var(--border);stroke-width:1.2;}
+          .menuitem{fill:none;stroke:none;}
+          .menuitem-active{fill:var(--accent-soft);}
+          .panel{fill:var(--surface);stroke:var(--border);stroke-width:1.2;}
+          .inputbox{fill:var(--bg);stroke:var(--border);stroke-width:1.2;}
+          .outputbox{fill:var(--bg);stroke:var(--accent);stroke-width:1.4;}
+          .btn{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.1;}
+          .lbl{font-family:'Noto Sans SC',sans-serif;font-size:13px;fill:var(--ink);}
+          .lbl-b{font-family:'Noto Sans SC',sans-serif;font-size:13px;fill:var(--ink);font-weight:600;}
+          .sub{font-family:'JetBrains Mono',monospace;font-size:10.5px;fill:var(--muted);}
+          .tag{font-family:'JetBrains Mono',monospace;font-size:11px;fill:var(--accent);font-weight:600;}
+        </style>
+
+        <!-- outer window -->
+        <rect x="10" y="10" width="900" height="360" rx="10" class="win"></rect>
+
+        <!-- menu bar -->
+        <rect x="10" y="10" width="900" height="34" rx="10" class="menubar"></rect>
+        <rect x="24" y="12" width="60" height="30" class="menuitem-active"></rect>
+        <text x="54" y="32" text-anchor="middle" class="tag">E1</text>
+        <text x="120" y="32" text-anchor="middle" class="lbl">E2</text>
+        <text x="186" y="32" text-anchor="middle" class="lbl">E3</text>
+        <text x="252" y="32" text-anchor="middle" class="lbl">E4</text>
+        <text x="318" y="32" text-anchor="middle" class="lbl">E5</text>
+        <text x="384" y="32" text-anchor="middle" class="lbl">E6</text>
+
+        <!-- left panel -->
+        <rect x="20" y="56" width="280" height="304" rx="8" class="panel"></rect>
+        <text x="34" y="82" class="lbl-b">[E1] 汉诺塔求解（示例）</text>
+        <text x="34" y="102" class="sub">输入一个正整数 n（盘子数量）</text>
+        <text x="34" y="128" class="lbl">输入（纯文本）：</text>
+        <rect x="34" y="136" width="252" height="140" rx="6" class="inputbox"></rect>
+        <text x="46" y="158" class="sub">4</text>
+        <rect x="34" y="288" width="120" height="26" rx="6" class="btn"></rect>
+        <text x="94" y="305" text-anchor="middle" class="lbl">加载文本文件...</text>
+        <rect x="162" y="288" width="80" height="26" rx="6" class="btn"></rect>
+        <text x="202" y="305" text-anchor="middle" class="lbl">填入示例</text>
+        <rect x="34" y="322" width="60" height="26" rx="6" class="btn"></rect>
+        <text x="64" y="339" text-anchor="middle" class="lbl-b">运行</text>
+
+        <!-- center output -->
+        <rect x="316" y="56" width="584" height="304" rx="8" class="outputbox"></rect>
+        <text x="332" y="80" class="lbl-b">输出</text>
+        <text x="332" y="104" class="sub">共 7 步（理论最少步数 2^n - 1 = 7）：</text>
+        <text x="332" y="122" class="sub">A -&gt; C</text>
+        <text x="332" y="140" class="sub">A -&gt; B</text>
+        <text x="332" y="158" class="sub">C -&gt; B</text>
+        <text x="332" y="176" class="sub">A -&gt; C</text>
+        <text x="332" y="194" class="sub">B -&gt; A</text>
+        <text x="332" y="212" class="sub">B -&gt; C</text>
+        <text x="332" y="230" class="sub">A -&gt; C</text>
+      </svg>
+      <div class="diagram-caption">
+        <span>顶部菜单：一次课一个菜单，同一分类的插件排在一起</span>
+        <span>左侧面板出现在"点开某个插件"之后；中间输出框只显示纯文本</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="quickstart">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="section-num">03</span>
       <h2 class="section-title">跑起来（两分钟）</h2>
     </div>
     <p class="section-desc">
@@ -378,7 +454,7 @@ python3 main.py</pre>
 cd platform-c
 make run</pre>
         <pre><span class="cmt"># 菜单会列出所有已加载插件</span>
-  [1] 汉诺塔求解（示例） (E1.3 递归算法)
+  [1] 汉诺塔求解（示例） (E1)
   [0] 退出</pre>
       </div>
     </div>
@@ -388,7 +464,7 @@ make run</pre>
 <section id="steps">
   <div class="wrap">
     <div class="section-head">
-      <span class="section-num">03</span>
+      <span class="section-num">04</span>
       <h2 class="section-title">编写你的第一个插件</h2>
     </div>
     <p class="section-desc">以 Python 版为例，五步做完；C 版流程完全一致，只是把类换成导出函数。</p>
@@ -407,29 +483,27 @@ make run</pre>
       <div class="step">
         <div class="step-num">2</div>
         <div>
-          <h3>继承 Plugin，声明参数</h3>
-          <p><code>params()</code> 里的每一项会被 UI 自动渲染成一个输入框，<code>name</code> 要和 <code>run()</code> 里取值的 key 对上。</p>
-          <pre><span class="kw">from</span> core.plugin_base <span class="kw">import</span> Plugin, ParamSpec
+          <h3>继承 Plugin，写清楚输入格式</h3>
+          <p>平台不解析你的输入——<code>description</code> 里用一句话说明格式，<code>example_input()</code> 给一个示例，方便自己和助教一键测试。</p>
+          <pre><span class="kw">from</span> core.plugin_base <span class="kw">import</span> Plugin
 
 <span class="kw">class</span> KmpPlugin(Plugin):
     name = <span class="cmt">"KMP 字符串匹配"</span>
-    category = <span class="cmt">"E3.1 字符串匹配"</span>
+    category = <span class="cmt">"E3"</span>
+    description = <span class="cmt">"两行文本：第一行主串，第二行模式串"</span>
 
-    <span class="kw">def</span> params(self):
-        <span class="kw">return</span> [
-            ParamSpec(name=<span class="cmt">"text"</span>, label=<span class="cmt">"主串"</span>, default=<span class="cmt">"ababcabcabababd"</span>),
-            ParamSpec(name=<span class="cmt">"pattern"</span>, label=<span class="cmt">"模式串"</span>, default=<span class="cmt">"abab"</span>),
-        ]</pre>
+    <span class="kw">def</span> example_input(self):
+        <span class="kw">return</span> <span class="cmt">"ababcabcabababd\nabab"</span></pre>
         </div>
       </div>
 
       <div class="step">
         <div class="step-num">3</div>
         <div>
-          <h3>实现 run()，返回字符串</h3>
-          <p>核心算法逻辑写在这里；不要用 <code>print()</code>，UI 只展示 <code>return</code> 的内容。</p>
-          <pre>    <span class="kw">def</span> run(self, **kwargs):
-        text, pattern = kwargs[<span class="cmt">"text"</span>], kwargs[<span class="cmt">"pattern"</span>]
+          <h3>实现 run(text)，返回字符串</h3>
+          <p><code>text</code> 是输入框里的全部内容，自己按约定的格式解析；不要用 <code>print()</code>，界面只展示 <code>return</code> 的内容。</p>
+          <pre>    <span class="kw">def</span> run(self, text):
+        text_str, pattern = text.strip().split(<span class="cmt">"\n"</span>)
         <span class="cmt"># ... 构造 next 数组、匹配 ...</span>
         <span class="kw">return</span> <span class="cmt">f"匹配位置: {positions}"</span></pre>
         </div>
@@ -439,9 +513,9 @@ make run</pre>
         <div class="step-num">4</div>
         <div>
           <h3>重新启动平台</h3>
-          <p>加载器会自动扫描 <code>plugins/</code>，无需修改任何核心文件，左侧列表里会出现你的插件分类。</p>
+          <p>加载器会自动扫描 <code>plugins/</code>，无需修改任何核心文件，顶部菜单栏里会出现你的插件分类。</p>
           <pre>python3 main.py
-<span class="cmt"># 左侧出现分组「E3.1 字符串匹配」→「KMP 字符串匹配」</span></pre>
+<span class="cmt"># 顶部出现菜单「E3」→ 里面有「KMP 字符串匹配」</span></pre>
         </div>
       </div>
 
@@ -449,7 +523,7 @@ make run</pre>
         <div class="step-num">5</div>
         <div>
           <h3>用边界用例自测</h3>
-          <p>至少验证一组正常输入和一组边界输入（空串、模式串比主串长等），确认异常不会导致平台崩溃。</p>
+          <p>至少验证一组正常输入和一组边界输入（空串、模式串比主串长等），确认异常不会导致平台崩溃。可以把测试数据存成 <code>.txt</code>，用"加载文本文件"反复读入。</p>
         </div>
       </div>
     </div>
@@ -459,7 +533,7 @@ make run</pre>
 <section id="timeline">
   <div class="wrap">
     <div class="section-head">
-      <span class="section-num">04</span>
+      <span class="section-num">05</span>
       <h2 class="section-title">六次实验，一条时间线</h2>
     </div>
     <p class="section-desc">每次实验对应平台里的一个新分类；E6 不再有 2 小时限制，按周推进。</p>
@@ -507,17 +581,17 @@ make run</pre>
 <section id="faq">
   <div class="wrap">
     <div class="section-head">
-      <span class="section-num">05</span>
+      <span class="section-num">06</span>
       <h2 class="section-title">常见问题</h2>
     </div>
 
     <div class="faq-item">
-      <h3>插件没有出现在列表 / 菜单里怎么办？</h3>
+      <h3>插件没有出现在菜单里怎么办？</h3>
       <p>Python 版检查文件名是否严格为 <code>plugin.py</code>、类是否直接继承 <code>Plugin</code>；C 版先看 <code>make</code> 是否报编译错误，再看运行时 <code>[plugin_manager]</code> 的报错信息。</p>
     </div>
     <div class="faq-item">
       <h3>怎么表示数组、矩阵、树、图这类非标量输入？</h3>
-      <p>平台不强制格式，每次实验的任务说明会给出建议格式（如矩阵用分号分隔行、树用带占位符的层序序列），全班统一格式，便于批量验收。</p>
+      <p>全部用纯文本表示，平台不强制具体格式，每次实验的任务说明会给出建议格式（如矩阵每行一行、数字间用逗号分隔；树用带占位符的层序序列），全班统一格式，便于用同一份 <code>.txt</code> 批量验收。</p>
     </div>
     <div class="faq-item">
       <h3>C 版为什么是文本菜单，不是图形界面？</h3>

@@ -1,37 +1,29 @@
 """插件接口规范（Python 版）。
 
+平台统一用纯文本做输入输出：
+  输入：一段文本（可以直接在输入框里打字，也可以点"加载文本文件"从 .txt 读入）
+  输出：一段文本，显示在中间的大输出框里
+
 写一个插件，只需要：
 1. 新建一个类，继承 Plugin；
-2. 重写 params()：告诉平台这个插件需要哪些输入框；
-3. 重写 run()：写你的算法逻辑，最后 return 一个字符串（会显示在界面上）。
+2. category 填实验编号，例如 "E1"——同一次课的插件会被放进同一个菜单；
+3. 重写 run(text)：自己解析 text，执行算法，最后 return 一段字符串。
 """
 
 
-class Param:
-    """描述一个输入参数。UI 会根据这个自动生成一个"标签 + 输入框"。"""
-
-    def __init__(self, name, label, default="", param_type="str", help_text=""):
-        self.name = name              # 内部名字，要和 run() 里用的 key 一致
-        self.label = label            # 显示给用户看的中文名字
-        self.default = default        # 输入框里默认填的内容
-        self.type = param_type        # 取值范围："int"（整数）/"float"（小数）/"str"（文本）
-        self.help_text = help_text    # 一句话提示，显示在输入框旁边
-
-
 class Plugin:
-    """所有插件的基类。写自己的插件时，继承它并重写下面两个方法即可。"""
+    """所有插件的基类。写自己的插件时，继承它并重写 run() 即可。"""
 
-    name = "未命名插件"       # 会显示在插件列表里，同一平台内不要和别人重名
-    category = "未分类"       # 建议写实验编号，例如 "E1.3 递归算法"
-    version = "1.0"
+    name = "未命名插件"     # 显示在菜单里的名字，同一平台内不要和别人重名
+    category = "E0"         # 实验编号，例如 "E1"、"E2"，用于放进同一个菜单栏
+    description = ""        # 一句话说明输入格式，会显示在左侧面板里
 
-    def params(self):
-        """返回一个 Param 列表。没有输入参数就返回空列表 []。"""
-        return []
+    def example_input(self):
+        """返回一段示例输入文本。点"填入示例"按钮时会自动填到输入框里，方便测试。"""
+        return ""
 
-    def run(self, **kwargs):
-        """执行插件的核心逻辑。kwargs 的 key 就是 params() 里每个 Param 的 name。"""
+    def run(self, text):
+        """text 是输入框里的全部内容（一整个字符串）。
+        在这里自己解析 text、执行算法，最后返回一段字符串作为运行结果。
+        """
         return "这个插件还没有实现 run() 方法"
-
-    def describe(self):
-        return f"[{self.category}] {self.name} v{self.version}"
