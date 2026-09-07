@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+platform-c/platform
+platform-c/plugins_bin/*.so
