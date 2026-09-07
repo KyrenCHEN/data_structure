@@ -1,116 +1,117 @@
-"""基础 UI（Tkinter，标准库自带，无需额外依赖）。
+"""基础图形界面（用 Python 自带的 tkinter，不需要额外安装任何东西）。
 
-布局：
-  左侧：按 category 分组的插件列表
-  右侧上：根据所选插件 params() 自动生成的输入表单
-  右侧下：运行结果输出区
+整体布局：
+  顶部：菜单栏——一次课的插件放在同一个菜单里（按 category 分组）
+  左侧：选中某个插件后出现的面板——插件说明 + 文本输入框 + 按钮
+  中间：一个大大的输出框，显示运行结果（纯文本）
 """
-from __future__ import annotations
 
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk, filedialog, messagebox
 
-from core.registry import registry, PluginRegistry
-from core.plugin_base import Plugin
+from core.registry import registry
 
 
 class PlatformApp(tk.Tk):
-    def __init__(self, reg: PluginRegistry = registry) -> None:
+    def __init__(self, reg=registry):
         super().__init__()
         self.reg = reg
         self.title("数据结构实验插件平台（Python）")
-        self.geometry("880x560")
-        self.current_plugin: Plugin | None = None
-        self.param_vars: dict[str, tk.StringVar] = {}
+        self.geometry("980x600")
+        self.current_plugin = None   # 当前选中的插件对象
 
+        self._build_menu()
         self._build_layout()
-        self._populate_plugin_list()
 
-    def _build_layout(self) -> None:
+    def _build_menu(self):
+        # 菜单栏：每个 category（比如 "E1"）是一个菜单，里面是这次课的所有插件
+        menubar = tk.Menu(self)
+        for category, plugins in self.reg.by_category().items():
+            menu = tk.Menu(menubar, tearoff=0)
+            for p in plugins:
+                # plugin=p 是 Python 的一个小技巧：让每个菜单项"记住"自己对应的插件
+                menu.add_command(label=p.name, command=lambda plugin=p: self._select_plugin(plugin))
+            menubar.add_cascade(label=category, menu=menu)
+        self.config(menu=menubar)
+
+    def _build_layout(self):
         paned = ttk.PanedWindow(self, orient=tk.HORIZONTAL)
         paned.pack(fill=tk.BOTH, expand=True)
 
-        left = ttk.Frame(paned, width=240)
+        # ---------- 左侧：插件说明 + 输入框 ----------
+        left = ttk.Frame(paned, width=280)
         paned.add(left, weight=1)
-        ttk.Label(left, text="插件列表", font=("", 11, "bold")).pack(anchor="w", padx=8, pady=(8, 0))
-        self.tree = ttk.Treeview(left, show="tree")
-        self.tree.pack(fill=tk.BOTH, expand=True, padx=8, pady=8)
-        self.tree.bind("<<TreeviewSelect>>", self._on_select)
 
+        self.title_label = ttk.Label(left, text="请从上方菜单选择一个插件", font=("", 12, "bold"), wraplength=260)
+        self.title_label.pack(anchor="w", padx=10, pady=(10, 4))
+
+        self.desc_label = ttk.Label(left, text="", foreground="#666", wraplength=260)
+        self.desc_label.pack(anchor="w", padx=10, pady=(0, 10))
+
+        ttk.Label(left, text="输入（纯文本）：").pack(anchor="w", padx=10)
+        self.input_box = tk.Text(left, height=10)
+        self.input_box.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0, 8))
+
+        btn_row = ttk.Frame(left)
+        btn_row.pack(fill=tk.X, padx=10, pady=(0, 8))
+        ttk.Button(btn_row, text="加载文本文件...", command=self._on_load_file).pack(side=tk.LEFT)
+        ttk.Button(btn_row, text="填入示例", command=self._on_fill_example).pack(side=tk.LEFT, padx=6)
+
+        self.run_btn = ttk.Button(left, text="运行", command=self._on_run, state=tk.DISABLED)
+        self.run_btn.pack(anchor="w", padx=10, pady=(0, 10))
+
+        # ---------- 中间：大输出框 ----------
         right = ttk.Frame(paned)
         paned.add(right, weight=3)
-
-        self.desc_label = ttk.Label(right, text="请选择左侧插件", font=("", 12, "bold"))
-        self.desc_label.pack(anchor="w", padx=10, pady=(10, 0))
-
-        self.form_frame = ttk.Frame(right)
-        self.form_frame.pack(fill=tk.X, padx=10, pady=10)
-
-        self.run_btn = ttk.Button(right, text="运行", command=self._on_run, state=tk.DISABLED)
-        self.run_btn.pack(anchor="w", padx=10)
-
-        ttk.Label(right, text="输出：").pack(anchor="w", padx=10, pady=(10, 0))
-        self.output = tk.Text(right, height=20)
+        ttk.Label(right, text="输出", font=("", 12, "bold")).pack(anchor="w", padx=10, pady=(10, 4))
+        self.output = tk.Text(right, wrap="word")
         self.output.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0, 10))
 
-    def _populate_plugin_list(self) -> None:
-        self.tree.delete(*self.tree.get_children())
-        self._node_to_plugin: dict[str, Plugin] = {}
-        for category, plugins in self.reg.by_category().items():
-            cat_node = self.tree.insert("", tk.END, text=category, open=True)
-            for p in plugins:
-                node = self.tree.insert(cat_node, tk.END, text=p.name)
-                self._node_to_plugin[node] = p
-
-    def _on_select(self, _event=None) -> None:
-        sel = self.tree.selection()
-        if not sel or sel[0] not in self._node_to_plugin:
-            return
-        plugin = self._node_to_plugin[sel[0]]
+    def _select_plugin(self, plugin):
+        # 从菜单里点了某个插件之后，刷新左侧面板
         self.current_plugin = plugin
-        self.desc_label.config(text=plugin.describe())
+        self.title_label.config(text=f"[{plugin.category}] {plugin.name}")
+        self.desc_label.config(text=plugin.description or "（该插件没有填写说明）")
         self.run_btn.config(state=tk.NORMAL)
+        self.input_box.delete("1.0", tk.END)
+        self.output.delete("1.0", tk.END)
 
-        for child in self.form_frame.winfo_children():
-            child.destroy()
-        self.param_vars.clear()
+    def _on_load_file(self):
+        # 弹出文件选择框，把选中的 .txt 文件内容读进输入框
+        path = filedialog.askopenfilename(title="选择文本文件", filetypes=[("文本文件", "*.txt"), ("所有文件", "*.*")])
+        if not path:
+            return
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                content = f.read()
+        except Exception as exc:
+            messagebox.showerror("读取失败", str(exc))
+            return
+        self.input_box.delete("1.0", tk.END)
+        self.input_box.insert(tk.END, content)
 
-        for i, spec in enumerate(plugin.params()):
-            ttk.Label(self.form_frame, text=f"{spec.label}：").grid(row=i, column=0, sticky="w", pady=2)
-            var = tk.StringVar(value=str(spec.default))
-            entry = ttk.Entry(self.form_frame, textvariable=var, width=40)
-            entry.grid(row=i, column=1, sticky="w", pady=2)
-            if spec.help:
-                ttk.Label(self.form_frame, text=spec.help, foreground="#888").grid(row=i, column=2, sticky="w", padx=6)
-            self.param_vars[spec.name] = var
-
-    def _on_run(self) -> None:
+    def _on_fill_example(self):
         if self.current_plugin is None:
             return
-        kwargs = {}
-        try:
-            for spec in self.current_plugin.params():
-                raw = self.param_vars[spec.name].get()
-                if spec.type == "int":
-                    kwargs[spec.name] = int(raw)
-                elif spec.type == "float":
-                    kwargs[spec.name] = float(raw)
-                else:
-                    kwargs[spec.name] = raw
-        except ValueError as exc:
-            messagebox.showerror("参数错误", str(exc))
+        self.input_box.delete("1.0", tk.END)
+        self.input_box.insert(tk.END, self.current_plugin.example_input())
+
+    def _on_run(self):
+        if self.current_plugin is None:
             return
+        text = self.input_box.get("1.0", tk.END)
 
         try:
-            result = self.current_plugin.run(**kwargs)
-        except Exception as exc:  # noqa: BLE001 插件异常需在 UI 上可见，不应崩溃平台
+            result = self.current_plugin.run(text)
+        except Exception as exc:
+            # 插件内部出错也不能让整个平台崩溃，把错误信息显示出来即可
             result = f"[运行出错] {exc!r}"
 
         self.output.delete("1.0", tk.END)
         self.output.insert(tk.END, result)
 
 
-def main() -> None:
+def main():
     app = PlatformApp()
     app.mainloop()
 

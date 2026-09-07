@@ -1,38 +1,29 @@
 """插件接口规范（Python 版）。
 
-任何插件必须继承 Plugin 并实现 params() 与 run()。
-run() 的返回值必须是 str，将原样显示在 UI 输出区。
+平台统一用纯文本做输入输出：
+  输入：一段文本（可以直接在输入框里打字，也可以点"加载文本文件"从 .txt 读入）
+  输出：一段文本，显示在中间的大输出框里
+
+写一个插件，只需要：
+1. 新建一个类，继承 Plugin；
+2. category 填实验编号，例如 "E1"——同一次课的插件会被放进同一个菜单；
+3. 重写 run(text)：自己解析 text，执行算法，最后 return 一段字符串。
 """
-from __future__ import annotations
-
-from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
-from typing import Any
 
 
-@dataclass
-class ParamSpec:
-    """描述一个可在 UI 中生成输入控件的参数。"""
-    name: str
-    label: str
-    type: str = "str"          # "int" | "float" | "str"
-    default: Any = ""
-    help: str = ""
+class Plugin:
+    """所有插件的基类。写自己的插件时，继承它并重写 run() 即可。"""
 
+    name = "未命名插件"     # 显示在菜单里的名字，同一平台内不要和别人重名
+    category = "E0"         # 实验编号，例如 "E1"、"E2"，用于放进同一个菜单栏
+    description = ""        # 一句话说明输入格式，会显示在左侧面板里
 
-class Plugin(ABC):
-    name: str = "unnamed"
-    category: str = "misc"     # 建议按实验编号命名，如 "E1.3 递归算法"
-    version: str = "1.0"
-    author: str = ""
+    def example_input(self):
+        """返回一段示例输入文本。点"填入示例"按钮时会自动填到输入框里，方便测试。"""
+        return ""
 
-    @abstractmethod
-    def params(self) -> list[ParamSpec]:
-        """声明本插件需要哪些输入参数，供 UI 自动生成表单。"""
-
-    @abstractmethod
-    def run(self, **kwargs: Any) -> str:
-        """执行核心算法逻辑，kwargs 的 key 与 params() 中的 name 对应。"""
-
-    def describe(self) -> str:
-        return f"[{self.category}] {self.name} v{self.version}"
+    def run(self, text):
+        """text 是输入框里的全部内容（一整个字符串）。
+        在这里自己解析 text、执行算法，最后返回一段字符串作为运行结果。
+        """
+        return "这个插件还没有实现 run() 方法"
