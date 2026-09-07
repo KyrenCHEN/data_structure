@@ -1,0 +1,537 @@
+<title>插件平台使用指南</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;600;700&family=Noto+Sans+SC:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#f5f6f3;
+  --surface:#ffffff;
+  --surface-2:#eef1ec;
+  --ink:#1b211d;
+  --muted:#5c655e;
+  --border:#d6dbd2;
+  --accent:#2f6f5e;
+  --accent-ink:#f2f8f5;
+  --accent-soft:#dfece5;
+  --accent-2:#a8621f;
+  --code-bg:#f0f1ec;
+  --code-ink:#31392f;
+  --shadow: 0 1px 2px rgba(30,40,32,.06), 0 8px 24px -12px rgba(30,40,32,.12);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14180f;
+    --surface:#1b2119;
+    --surface-2:#212a20;
+    --ink:#e7ece3;
+    --muted:#9aa596;
+    --border:#323b2e;
+    --accent:#6fbfa2;
+    --accent-ink:#0d1a15;
+    --accent-soft:#233229;
+    --accent-2:#e0a45e;
+    --code-bg:#1e2519;
+    --code-ink:#dbe6d4;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 28px -14px rgba(0,0,0,.55);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14180f;
+  --surface:#1b2119;
+  --surface-2:#212a20;
+  --ink:#e7ece3;
+  --muted:#9aa596;
+  --border:#323b2e;
+  --accent:#6fbfa2;
+  --accent-ink:#0d1a15;
+  --accent-soft:#233229;
+  --accent-2:#e0a45e;
+  --code-bg:#1e2519;
+  --code-ink:#dbe6d4;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 28px -14px rgba(0,0,0,.55);
+}
+
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:"Noto Sans SC","Noto Sans",system-ui,sans-serif;
+  line-height:1.65;
+  font-size:16px;
+}
+h1,h2,h3{
+  font-family:"Noto Serif SC","Noto Serif",serif;
+  font-weight:700;
+  text-wrap:balance;
+  margin:0;
+  color:var(--ink);
+}
+code, .mono{
+  font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+.wrap{max-width:1040px;margin:0 auto;padding:0 28px;}
+
+/* ---------- header ---------- */
+header.hero{
+  padding:64px 0 48px;
+  border-bottom:1px solid var(--border);
+}
+.eyebrow{
+  font-family:"JetBrains Mono",monospace;
+  font-size:12.5px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--accent);
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:18px;
+}
+.eyebrow::before{
+  content:"";
+  width:22px;height:1px;background:var(--accent);
+}
+h1.title{
+  font-size:clamp(32px,4.4vw,46px);
+  line-height:1.15;
+}
+p.lede{
+  max-width:62ch;
+  font-size:17.5px;
+  color:var(--muted);
+  margin-top:16px;
+}
+.pill-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px;}
+.pill{
+  border:1px solid var(--border);
+  background:var(--surface);
+  border-radius:999px;
+  padding:7px 14px;
+  font-size:13px;
+  color:var(--muted);
+  display:flex;align-items:center;gap:7px;
+}
+.pill b{color:var(--ink);font-weight:600;}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--accent);}
+.dot.c{background:var(--accent-2);}
+
+/* ---------- sections ---------- */
+section{padding:52px 0;border-bottom:1px solid var(--border);}
+section:last-of-type{border-bottom:none;}
+.section-head{display:flex;align-items:baseline;gap:14px;margin-bottom:28px;}
+.section-num{
+  font-family:"JetBrains Mono",monospace;
+  color:var(--accent);
+  font-size:14px;
+  font-weight:600;
+}
+h2.section-title{font-size:26px;}
+p.section-desc{color:var(--muted);max-width:66ch;margin:10px 0 0;}
+
+/* ---------- architecture diagram ---------- */
+.diagram-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:20px;
+  box-shadow:var(--shadow);
+  overflow-x:auto;
+}
+.diagram-card svg{display:block;min-width:640px;width:100%;height:auto;}
+.diagram-caption{
+  display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  margin-top:14px;font-size:13px;color:var(--muted);
+}
+
+/* ---------- two-column quickstart ---------- */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+@media (max-width:760px){.grid-2{grid-template-columns:1fr;}}
+.track-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:22px 22px 24px;
+  box-shadow:var(--shadow);
+}
+.track-head{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.track-tag{
+  font-family:"JetBrains Mono",monospace;
+  font-size:11.5px;
+  letter-spacing:.06em;
+  padding:3px 9px;
+  border-radius:6px;
+  background:var(--accent-soft);
+  color:var(--accent);
+  font-weight:600;
+}
+.track-tag.c{background:color-mix(in srgb, var(--accent-2) 18%, transparent);color:var(--accent-2);}
+.track-card h3{font-size:18px;}
+.track-card p{color:var(--muted);font-size:14.5px;margin:8px 0 14px;}
+pre{
+  background:var(--code-bg);
+  color:var(--code-ink);
+  border-radius:10px;
+  padding:14px 16px;
+  overflow-x:auto;
+  font-size:13.5px;
+  margin:0 0 10px;
+  border:1px solid var(--border);
+}
+pre .cmt{color:var(--muted);}
+pre .kw{color:var(--accent);}
+
+/* ---------- steps ---------- */
+.steps{display:flex;flex-direction:column;gap:0;}
+.step{
+  display:grid;
+  grid-template-columns:52px 1fr;
+  gap:20px;
+  padding:26px 0;
+  border-top:1px solid var(--border);
+}
+.step:first-child{border-top:none;padding-top:0;}
+.step-num{
+  font-family:"JetBrains Mono",monospace;
+  font-weight:600;
+  font-size:15px;
+  color:var(--accent);
+  width:40px;height:40px;
+  border:1px solid var(--accent);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+}
+.step h3{font-size:17px;margin-bottom:8px;}
+.step p{color:var(--muted);font-size:14.5px;margin:0 0 12px;max-width:68ch;}
+.step pre{max-width:640px;}
+
+/* ---------- timeline ---------- */
+.timeline{display:flex;flex-direction:column;border:1px solid var(--border);border-radius:14px;overflow:hidden;background:var(--surface);box-shadow:var(--shadow);}
+.tl-row{display:grid;grid-template-columns:110px 1fr 1fr;gap:0;}
+.tl-row + .tl-row{border-top:1px solid var(--border);}
+.tl-cell{padding:16px 18px;}
+.tl-row.tl-head{background:var(--surface-2);}
+.tl-row.tl-head .tl-cell{
+  font-family:"JetBrains Mono",monospace;
+  font-size:11.5px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--muted);
+  padding:11px 18px;
+}
+.tl-id{
+  font-family:"JetBrains Mono",monospace;
+  font-weight:700;
+  color:var(--accent);
+  font-size:14px;
+  display:flex;align-items:center;
+  border-right:1px solid var(--border);
+}
+.tl-row.tl-e6 .tl-id{color:var(--accent-2);}
+.tl-cell h4{margin:0 0 4px;font-size:14.5px;font-family:"Noto Sans SC",sans-serif;font-weight:600;}
+.tl-cell p{margin:0;font-size:13.5px;color:var(--muted);}
+.tl-cell + .tl-cell{border-left:1px solid var(--border);}
+@media (max-width:700px){
+  .tl-row{grid-template-columns:1fr;}
+  .tl-id{border-right:none;border-bottom:1px solid var(--border);padding:10px 18px;}
+  .tl-cell + .tl-cell{border-left:none;border-top:1px solid var(--border);}
+}
+
+/* ---------- faq ---------- */
+.faq-item{padding:20px 0;border-top:1px solid var(--border);}
+.faq-item:first-child{border-top:none;}
+.faq-item h3{font-size:15.5px;font-family:"Noto Sans SC",sans-serif;font-weight:600;margin-bottom:6px;}
+.faq-item p{margin:0;color:var(--muted);font-size:14.5px;max-width:68ch;}
+
+footer{padding:36px 0 60px;}
+footer p{color:var(--muted);font-size:13.5px;}
+footer code{background:var(--code-bg);padding:2px 6px;border-radius:5px;border:1px solid var(--border);}
+</style>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">数据结构实验课程 · 平台使用指南</div>
+    <h1 class="title">把每一次实验，<br>接成同一块插件平台</h1>
+    <p class="lede">
+      从 E1.3 的递归算法到 E5.2 的排序算法，你写的每一个功能都不是一次性脚本，
+      而是一个可以在平台里点开、运行、留存的插件。本页说明平台如何组织、
+      怎样在 10 分钟内跑通示例、以及编写自己插件的完整步骤。
+    </p>
+    <div class="pill-row">
+      <span class="pill"><span class="dot"></span>Python 版 · Tkinter 图形界面</span>
+      <span class="pill"><span class="dot c"></span>C 版 · dlopen 动态加载 + 文本菜单</span>
+      <span class="pill">示例插件：E1.3 汉诺塔（两版均含）</span>
+    </div>
+  </div>
+</header>
+
+<section id="architecture">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="section-num">01</span>
+      <h2 class="section-title">平台是怎么拼起来的</h2>
+    </div>
+    <p class="section-desc">
+      两个版本共享同一套心智模型：核心程序只负责「发现插件、渲染界面」，
+      从不认识某个具体算法；你的插件通过统一接口挂进去，核心程序在运行时才知道它的存在。
+    </p>
+
+    <div class="diagram-card">
+      <svg viewBox="0 0 920 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="插件平台架构图：加载器扫描插件目录，注册到核心，UI 渲染调用">
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"></path>
+          </marker>
+        </defs>
+        <style>
+          .box{fill:var(--surface);stroke:var(--border);stroke-width:1.2;}
+          .box-accent{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.3;}
+          .lbl{font-family:'Noto Sans SC',sans-serif;font-size:14px;fill:var(--ink);font-weight:600;}
+          .sub{font-family:'JetBrains Mono',monospace;font-size:11px;fill:var(--muted);}
+          .edge{stroke:var(--muted);stroke-width:1.3;fill:none;marker-end:url(#arrow);}
+          .edge-label{font-family:'JetBrains Mono',monospace;font-size:10.5px;fill:var(--muted);}
+        </style>
+
+        <!-- plugins column -->
+        <rect x="20" y="40" width="170" height="60" rx="10" class="box"></rect>
+        <text x="105" y="65" text-anchor="middle" class="lbl">你的插件 A</text>
+        <text x="105" y="82" text-anchor="middle" class="sub">plugins/kmp_xxxx/</text>
+
+        <rect x="20" y="120" width="170" height="60" rx="10" class="box"></rect>
+        <text x="105" y="145" text-anchor="middle" class="lbl">你的插件 B</text>
+        <text x="105" y="162" text-anchor="middle" class="sub">plugins/sort_xxxx/</text>
+
+        <rect x="20" y="200" width="170" height="60" rx="10" class="box-accent"></rect>
+        <text x="105" y="225" text-anchor="middle" class="lbl">示例插件</text>
+        <text x="105" y="242" text-anchor="middle" class="sub">example_recursion</text>
+
+        <!-- loader -->
+        <rect x="280" y="110" width="180" height="80" rx="10" class="box"></rect>
+        <text x="370" y="140" text-anchor="middle" class="lbl">加载器</text>
+        <text x="370" y="158" text-anchor="middle" class="sub">loader.py / plugin_manager.c</text>
+        <text x="370" y="174" text-anchor="middle" class="sub">扫描目录 · 动态导入/dlopen</text>
+
+        <!-- registry -->
+        <rect x="540" y="110" width="180" height="80" rx="10" class="box"></rect>
+        <text x="630" y="140" text-anchor="middle" class="lbl">注册表</text>
+        <text x="630" y="158" text-anchor="middle" class="sub">registry.py / PluginManager</text>
+        <text x="630" y="174" text-anchor="middle" class="sub">按 category 分组持有实例</text>
+
+        <!-- ui -->
+        <rect x="800" y="40" width="100" height="60" rx="10" class="box-accent"></rect>
+        <text x="850" y="65" text-anchor="middle" class="lbl">图形界面</text>
+        <text x="850" y="82" text-anchor="middle" class="sub">ui/app.py</text>
+
+        <rect x="800" y="200" width="100" height="60" rx="10" class="box-accent"></rect>
+        <text x="850" y="225" text-anchor="middle" class="lbl">文本菜单</text>
+        <text x="850" y="242" text-anchor="middle" class="sub">menu_ui.c</text>
+
+        <!-- edges -->
+        <path d="M190,70 C240,70 240,140 280,140" class="edge"></path>
+        <path d="M190,150 L280,150" class="edge"></path>
+        <path d="M190,230 C240,230 240,160 280,160" class="edge"></path>
+        <path d="M460,150 L540,150" class="edge"></path>
+        <text x="500" y="140" text-anchor="middle" class="edge-label">register()</text>
+
+        <path d="M720,135 C760,120 770,80 800,68" class="edge"></path>
+        <path d="M720,165 C760,190 770,225 800,228" class="edge"></path>
+        <text x="770" y="105" text-anchor="middle" class="edge-label">Python</text>
+        <text x="770" y="200" text-anchor="middle" class="edge-label">C</text>
+      </svg>
+      <div class="diagram-caption">
+        <span>核心（加载器 + 注册表 + UI）由平台提供，学生禁止修改</span>
+        <span>插件目录由学生新增，互不干扰</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="quickstart">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="section-num">02</span>
+      <h2 class="section-title">跑起来（两分钟）</h2>
+    </div>
+    <p class="section-desc">
+      不熟悉命令行也没关系——用 VSCode 打开对应文件夹，Python 版点右上角 ▶，C 版按 <code>F5</code>，
+      效果和下面的命令完全一样（配置已内置在 <code>.vscode/</code> 里，零命令行版详见 <code>docs/vscode_setup.md</code>）。
+    </p>
+    <div class="grid-2">
+      <div class="track-card">
+        <div class="track-head">
+          <span class="track-tag">python</span>
+          <h3>Tkinter 图形界面</h3>
+        </div>
+        <p>标准库自带 <code>tkinter</code>，无需 <code>pip install</code>。要求 Python ≥ 3.10。</p>
+        <pre><span class="cmt"># 进入平台目录并启动</span>
+cd platform-python
+python3 main.py</pre>
+        <pre><span class="cmt"># 启动后终端会打印已加载的插件</span>
+[main] 已加载插件: ['汉诺塔求解（示例）']</pre>
+      </div>
+
+      <div class="track-card">
+        <div class="track-head">
+          <span class="track-tag c">c</span>
+          <h3>dlopen 动态加载 + 文本菜单</h3>
+        </div>
+        <p>插件各自编译为 <code>.so</code>，核心程序无需重新编译即可加载新插件。</p>
+        <pre><span class="cmt"># 编译核心程序 + 全部插件，然后运行</span>
+cd platform-c
+make run</pre>
+        <pre><span class="cmt"># 菜单会列出所有已加载插件</span>
+  [1] 汉诺塔求解（示例） (E1.3 递归算法)
+  [0] 退出</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="steps">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="section-num">03</span>
+      <h2 class="section-title">编写你的第一个插件</h2>
+    </div>
+    <p class="section-desc">以 Python 版为例，五步做完；C 版流程完全一致，只是把类换成导出函数。</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div>
+          <h3>新建插件目录</h3>
+          <p>在 <code>plugins/</code> 下新建一个目录，命名建议带上算法名和学号后四位，避免和同学重名。</p>
+          <pre>plugins/kmp_1234/
+  plugin.py</pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div>
+          <h3>继承 Plugin，声明参数</h3>
+          <p><code>params()</code> 里的每一项会被 UI 自动渲染成一个输入框，<code>name</code> 要和 <code>run()</code> 里取值的 key 对上。</p>
+          <pre><span class="kw">from</span> core.plugin_base <span class="kw">import</span> Plugin, ParamSpec
+
+<span class="kw">class</span> KmpPlugin(Plugin):
+    name = <span class="cmt">"KMP 字符串匹配"</span>
+    category = <span class="cmt">"E3.1 字符串匹配"</span>
+
+    <span class="kw">def</span> params(self):
+        <span class="kw">return</span> [
+            ParamSpec(name=<span class="cmt">"text"</span>, label=<span class="cmt">"主串"</span>, default=<span class="cmt">"ababcabcabababd"</span>),
+            ParamSpec(name=<span class="cmt">"pattern"</span>, label=<span class="cmt">"模式串"</span>, default=<span class="cmt">"abab"</span>),
+        ]</pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div>
+          <h3>实现 run()，返回字符串</h3>
+          <p>核心算法逻辑写在这里；不要用 <code>print()</code>，UI 只展示 <code>return</code> 的内容。</p>
+          <pre>    <span class="kw">def</span> run(self, **kwargs):
+        text, pattern = kwargs[<span class="cmt">"text"</span>], kwargs[<span class="cmt">"pattern"</span>]
+        <span class="cmt"># ... 构造 next 数组、匹配 ...</span>
+        <span class="kw">return</span> <span class="cmt">f"匹配位置: {positions}"</span></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div>
+          <h3>重新启动平台</h3>
+          <p>加载器会自动扫描 <code>plugins/</code>，无需修改任何核心文件，左侧列表里会出现你的插件分类。</p>
+          <pre>python3 main.py
+<span class="cmt"># 左侧出现分组「E3.1 字符串匹配」→「KMP 字符串匹配」</span></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">5</div>
+        <div>
+          <h3>用边界用例自测</h3>
+          <p>至少验证一组正常输入和一组边界输入（空串、模式串比主串长等），确认异常不会导致平台崩溃。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="timeline">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="section-num">04</span>
+      <h2 class="section-title">六次实验，一条时间线</h2>
+    </div>
+    <p class="section-desc">每次实验对应平台里的一个新分类；E6 不再有 2 小时限制，按周推进。</p>
+
+    <div class="timeline">
+      <div class="tl-row tl-head">
+        <div class="tl-cell">实验</div>
+        <div class="tl-cell">课堂 90 分钟讲什么</div>
+        <div class="tl-cell">课后集成到平台的插件</div>
+      </div>
+      <div class="tl-row">
+        <div class="tl-cell tl-id">E1</div>
+        <div class="tl-cell"><h4>插件接口 + 平台搭建</h4><p>走读 Plugin 接口、现场演示新增插件</p></div>
+        <div class="tl-cell"><h4>任一递归算法</h4><p>阶乘 / Fibonacci / 快速幂（三选一）</p></div>
+      </div>
+      <div class="tl-row">
+        <div class="tl-cell tl-id">E2</div>
+        <div class="tl-cell"><h4>顺序表 / 链表 / 栈 / 队列</h4><p>复杂度对比 + 括号匹配课堂示例</p></div>
+        <div class="tl-cell"><h4>线性表 + 一个应用</h4><p>表达式求值 或 层序遍历模拟</p></div>
+      </div>
+      <div class="tl-row">
+        <div class="tl-cell tl-id">E3</div>
+        <div class="tl-cell"><h4>KMP + 矩阵操作</h4><p>手推 next 数组，遥感矩阵运算引入</p></div>
+        <div class="tl-cell"><h4>KMP 匹配 + 矩阵三则运算</h4><p>加法 / 转置 / 乘法</p></div>
+      </div>
+      <div class="tl-row">
+        <div class="tl-cell tl-id">E4</div>
+        <div class="tl-cell"><h4>二叉树遍历 + 图存储</h4><p>邻接表 DFS 现场跟做</p></div>
+        <div class="tl-cell"><h4>二叉树四种遍历 + 图 DFS/BFS</h4><p></p></div>
+      </div>
+      <div class="tl-row">
+        <div class="tl-cell tl-id">E5</div>
+        <div class="tl-cell"><h4>查找 + 排序谱系</h4><p>比较次数可视化对比 O(n²) 与 O(n log n)</p></div>
+        <div class="tl-cell"><h4>二分/顺序查找 + 快排或归并</h4><p></p></div>
+      </div>
+      <div class="tl-row tl-e6">
+        <div class="tl-cell tl-id">E6</div>
+        <div class="tl-cell"><h4>分组：专业场景设计</h4><p>选题评审 + 中期检查，不设 2 小时上限</p></div>
+        <div class="tl-cell"><h4>复用 ≥2 种数据结构的遥感应用插件</h4><p>如四叉树+KMP 做影像检索，图+BFS 做河网连通性</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="section-num">05</span>
+      <h2 class="section-title">常见问题</h2>
+    </div>
+
+    <div class="faq-item">
+      <h3>插件没有出现在列表 / 菜单里怎么办？</h3>
+      <p>Python 版检查文件名是否严格为 <code>plugin.py</code>、类是否直接继承 <code>Plugin</code>；C 版先看 <code>make</code> 是否报编译错误，再看运行时 <code>[plugin_manager]</code> 的报错信息。</p>
+    </div>
+    <div class="faq-item">
+      <h3>怎么表示数组、矩阵、树、图这类非标量输入？</h3>
+      <p>平台不强制格式，每次实验的任务说明会给出建议格式（如矩阵用分号分隔行、树用带占位符的层序序列），全班统一格式，便于批量验收。</p>
+    </div>
+    <div class="faq-item">
+      <h3>C 版为什么是文本菜单，不是图形界面？</h3>
+      <p>刻意的取舍：C 原生做图形界面需要额外的 GUI 库，会把课程重心从数据结构挪到界面编程上。文本菜单同样能验证「插件动态加载」这个核心概念，且在任意 Linux/macOS 环境零依赖运行。</p>
+    </div>
+    <div class="faq-item">
+      <h3>提交时要交哪些文件？</h3>
+      <p>只提交 <code>plugins/&lt;你的目录&gt;/</code>，不要提交未修改过的核心文件（<code>core/</code>、<code>ui/</code>、<code>src/</code> 等）。</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>完整接口规范与提交要求见仓库 <code>docs/student_manual.md</code>；课程逐次教案见 <code>docs/course_design.md</code>。</p>
+  </div>
+</footer>
