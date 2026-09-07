@@ -1,5 +1,8 @@
 # 数据结构实验插件平台（Python 版）
 
+不熟悉命令行？用 VSCode 打开这个文件夹，打开 `main.py` 点右上角 ▶ 即可运行，详见 [`../docs/vscode_setup.md`](../docs/vscode_setup.md)。
+
+命令行方式：
 ```bash
 python3 main.py
 ```

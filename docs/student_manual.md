@@ -2,11 +2,13 @@
 
 版本对应：`platform-python`、`platform-c`（两版接口语义一致，任选其一完成作业，除非任务另有说明）。
 
+> **不熟悉命令行？** 直接看 [`vscode_setup.md`](vscode_setup.md)——全程只需要点 VSCode 里的按钮（▶ 或 F5），本手册后面的 `python3 main.py` / `make run` 命令都有对应的按钮可以代替手动输入。
+
 ## 1. 目录结构
 
 ```
 platform-python/
-  core/plugin_base.py   插件基类 Plugin、参数描述 ParamSpec
+  core/plugin_base.py   插件基类 Plugin、参数描述 Param
   core/registry.py      插件注册表（一般无需修改）
   core/loader.py        插件自动发现与加载（一般无需修改）
   ui/app.py             Tkinter 图形界面
@@ -26,12 +28,14 @@ platform-c/
 
 ## 2. 运行平台
 
+> 下面给的是命令行方式。用 VSCode 的同学可以直接跳过命令行，看 [`vscode_setup.md`](vscode_setup.md)：Python 版点▶按钮，C 版按 F5，效果完全一样。
+
 ### Python 版
 ```bash
 cd platform-python
 python3 main.py
 ```
-要求 Python ≥ 3.10（用到了 `list[int]` 等语法）。仅依赖标准库（`tkinter`），无需 `pip install`。若 `tkinter` 缺失，Linux 下用包管理器安装 `python3-tk`。
+要求 Python ≥ 3.10。仅依赖标准库（`tkinter`），无需 `pip install`。若 `tkinter` 缺失，Linux 下用包管理器安装 `python3-tk`。
 
 ### C 版
 ```bash
@@ -39,26 +43,26 @@ cd platform-c
 make        # 编译核心程序 + 编译 plugins/ 下所有插件为 .so
 make run    # 编译并直接运行
 ```
-依赖：`gcc`、`make`，Linux/macOS 下 `dlopen` 为 glibc/libSystem 自带。Windows 建议使用 WSL。
+依赖：`gcc`、`make`，Linux/macOS 下 `dlopen` 为 glibc/libSystem 自带。Windows 必须用 WSL（原生 Windows 没有 `dlopen`）。
 
 ## 3. 插件接口规范
 
 ### 3.1 Python
 
 ```python
-from core.plugin_base import Plugin, ParamSpec
+from core.plugin_base import Plugin, Param
 
 class MyPlugin(Plugin):
     name = "我的插件名"              # UI 中显示的名称，同一平台内不可重复
     category = "E2.1 线性表"          # 建议填实验编号，UI 按此分组
     version = "1.0"
 
-    def params(self) -> list[ParamSpec]:
+    def params(self):
         return [
-            ParamSpec(name="arr", label="整数序列（逗号分隔）", type="str", default="3,1,2"),
+            Param(name="arr", label="整数序列（逗号分隔）", param_type="str", default="3,1,2"),
         ]
 
-    def run(self, **kwargs) -> str:
+    def run(self, **kwargs):
         arr = [int(x) for x in kwargs["arr"].split(",")]
         # ... 你的算法逻辑 ...
         return "结果：" + str(sorted(arr))
@@ -66,7 +70,7 @@ class MyPlugin(Plugin):
 
 要点：
 - `params()` 返回的每一项会在 UI 里自动生成一个输入框，`name` 必须与 `run()` 里读取的 key 一致。
-- `type` 目前支持 `"int"`、`"float"`、`"str"`；复杂结构（数组、树、图）一律用 `"str"`，自行在 `run()` 内解析，解析格式由你在插件里约定并写清楚 `help` 字段。
+- `param_type` 目前支持 `"int"`、`"float"`、`"str"`；复杂结构（数组、树、图）一律用 `"str"`，自行在 `run()` 内解析，解析格式由你在插件里约定并写清楚 `help_text` 字段。
 - `run()` **必须返回字符串**；不要在插件内部调用 `print()` 展示结果——UI 只显示返回值。
 - `run()` 内部要对非法输入做基本校验并返回可读的错误信息，**不要让异常直接抛出到平台**（未捕获的异常会被 `ui/app.py` 兜底转成 `[运行出错] ...` 显示，但更好的做法是插件自己判断并给出有意义的提示）。
 

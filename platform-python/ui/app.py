@@ -1,32 +1,30 @@
-"""基础 UI（Tkinter，标准库自带，无需额外依赖）。
+"""基础图形界面（用 Python 自带的 tkinter，不需要额外安装任何东西）。
 
-布局：
-  左侧：按 category 分组的插件列表
-  右侧上：根据所选插件 params() 自动生成的输入表单
-  右侧下：运行结果输出区
+界面分三块：
+  左边：插件列表（按 category 分组）
+  右边上：根据当前选中插件的 params() 自动生成的输入框
+  右边下：点击"运行"之后，算法的输出结果
 """
-from __future__ import annotations
 
 import tkinter as tk
 from tkinter import ttk, messagebox
 
-from core.registry import registry, PluginRegistry
-from core.plugin_base import Plugin
+from core.registry import registry
 
 
 class PlatformApp(tk.Tk):
-    def __init__(self, reg: PluginRegistry = registry) -> None:
+    def __init__(self, reg=registry):
         super().__init__()
         self.reg = reg
         self.title("数据结构实验插件平台（Python）")
         self.geometry("880x560")
-        self.current_plugin: Plugin | None = None
-        self.param_vars: dict[str, tk.StringVar] = {}
+        self.current_plugin = None   # 当前选中的插件对象
+        self.param_vars = {}         # 每个输入框对应一个 StringVar，方便读取用户输入
 
         self._build_layout()
         self._populate_plugin_list()
 
-    def _build_layout(self) -> None:
+    def _build_layout(self):
         paned = ttk.PanedWindow(self, orient=tk.HORIZONTAL)
         paned.pack(fill=tk.BOTH, expand=True)
 
@@ -53,16 +51,18 @@ class PlatformApp(tk.Tk):
         self.output = tk.Text(right, height=20)
         self.output.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0, 10))
 
-    def _populate_plugin_list(self) -> None:
+    def _populate_plugin_list(self):
+        # 把所有已加载的插件按 category 分组，画到左边的树状列表里
         self.tree.delete(*self.tree.get_children())
-        self._node_to_plugin: dict[str, Plugin] = {}
+        self._node_to_plugin = {}
         for category, plugins in self.reg.by_category().items():
             cat_node = self.tree.insert("", tk.END, text=category, open=True)
             for p in plugins:
                 node = self.tree.insert(cat_node, tk.END, text=p.name)
                 self._node_to_plugin[node] = p
 
-    def _on_select(self, _event=None) -> None:
+    def _on_select(self, _event=None):
+        # 用户点了左边某个插件后，动态生成右边的输入表单
         sel = self.tree.selection()
         if not sel or sel[0] not in self._node_to_plugin:
             return
@@ -75,42 +75,44 @@ class PlatformApp(tk.Tk):
             child.destroy()
         self.param_vars.clear()
 
-        for i, spec in enumerate(plugin.params()):
-            ttk.Label(self.form_frame, text=f"{spec.label}：").grid(row=i, column=0, sticky="w", pady=2)
-            var = tk.StringVar(value=str(spec.default))
+        for i, param in enumerate(plugin.params()):
+            ttk.Label(self.form_frame, text=f"{param.label}：").grid(row=i, column=0, sticky="w", pady=2)
+            var = tk.StringVar(value=str(param.default))
             entry = ttk.Entry(self.form_frame, textvariable=var, width=40)
             entry.grid(row=i, column=1, sticky="w", pady=2)
-            if spec.help:
-                ttk.Label(self.form_frame, text=spec.help, foreground="#888").grid(row=i, column=2, sticky="w", padx=6)
-            self.param_vars[spec.name] = var
+            if param.help_text:
+                ttk.Label(self.form_frame, text=param.help_text, foreground="#888").grid(row=i, column=2, sticky="w", padx=6)
+            self.param_vars[param.name] = var
 
-    def _on_run(self) -> None:
+    def _on_run(self):
+        # 点击"运行"：把每个输入框的文本转换成对应类型，再调用插件的 run()
         if self.current_plugin is None:
             return
         kwargs = {}
         try:
-            for spec in self.current_plugin.params():
-                raw = self.param_vars[spec.name].get()
-                if spec.type == "int":
-                    kwargs[spec.name] = int(raw)
-                elif spec.type == "float":
-                    kwargs[spec.name] = float(raw)
+            for param in self.current_plugin.params():
+                raw = self.param_vars[param.name].get()
+                if param.type == "int":
+                    kwargs[param.name] = int(raw)
+                elif param.type == "float":
+                    kwargs[param.name] = float(raw)
                 else:
-                    kwargs[spec.name] = raw
+                    kwargs[param.name] = raw
         except ValueError as exc:
             messagebox.showerror("参数错误", str(exc))
             return
 
         try:
             result = self.current_plugin.run(**kwargs)
-        except Exception as exc:  # noqa: BLE001 插件异常需在 UI 上可见，不应崩溃平台
+        except Exception as exc:
+            # 插件内部出错也不能让整个平台崩溃，把错误信息显示出来即可
             result = f"[运行出错] {exc!r}"
 
         self.output.delete("1.0", tk.END)
         self.output.insert(tk.END, result)
 
 
-def main() -> None:
+def main():
     app = PlatformApp()
     app.mainloop()
 
