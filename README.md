@@ -6,3 +6,4 @@
 - C 平台：[`platform-c/`](platform-c/)
 
 两版平台均已包含 E1.3（递归/汉诺塔）示例插件，作为学生编写自己插件的参照实现。
+- KMP 算法交互演示（单文件，浏览器直接打开）：[`docs/kmp.html`](docs/kmp.html)

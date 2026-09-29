@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KMP 算法可视化</title>
+<style>
+:root{--bg:#fafaf9;--fg:#1c1c1c;--mute:#8a8a85;--line:#dcdcd7;--cw:38px;
+--ok:#2f9e6f;--okbg:#e4f4ec;--bad:#d64545;--badbg:#fbe6e6;
+--pre:#3b6fd4;--prebg:#e5edfb;--suf:#d98324;--sufbg:#fbeedd}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.6 -apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+main{max-width:1000px;margin:0 auto;padding:32px 20px 64px}
+h1{font-size:22px;font-weight:600;margin:0}
+.sub{color:var(--mute);margin:4px 0 20px}
+h2{font-size:16px;font-weight:600;margin:0 0 4px}
+h2 small{font-weight:400;color:var(--mute);margin-left:8px;font-size:13px}
+.hint{color:var(--mute);font-size:13px;margin:0 0 12px}
+section{border-top:1px solid var(--line);padding:24px 0 8px}
+.inputs{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin-bottom:20px}
+label{color:var(--mute);font-size:13px}
+input,select,button{font:inherit;font-size:14px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--fg);padding:4px 10px}
+input{font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.08em;margin-left:6px}
+#P{width:170px}#T{width:330px}
+button{cursor:pointer}button:hover{border-color:#999}
+.ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:6px}
+.step{color:var(--mute);font-size:13px;margin-left:6px}
+.scroll{overflow-x:auto;padding:4px 0 10px}
+.stage{width:max-content;min-width:100%}
+.line{display:flex;align-items:center;height:calc(var(--cw) + 2px)}
+.line.sm{height:22px}
+.lab{position:sticky;left:0;z-index:3;width:76px;flex:none;height:100%;display:flex;align-items:center;color:var(--mute);font-size:13px;background:var(--bg)}
+.strip{display:flex;flex:none;transition:transform .45s ease,opacity .3s}
+.hide{opacity:0}
+.c{width:var(--cw);height:var(--cw);display:flex;align-items:center;justify-content:center;background:#fff;
+border:1px solid var(--line);border-right-width:0;font:500 18px ui-monospace,Menlo,Consolas,monospace;
+transition:background .2s,color .2s}
+.strip .c:last-child{border-right-width:1px}
+.idx .c,.mk{border:0;background:none;height:20px;font-size:11px;color:var(--mute)}
+.mk{width:var(--cw);font-size:12px;font-weight:600;color:var(--fg);font-family:ui-monospace,Menlo,monospace}
+.c.ok{background:var(--okbg);color:var(--ok)}
+.c.bad{background:var(--badbg);color:var(--bad)}
+.c.now{box-shadow:inset 0 0 0 2px currentColor}
+.c.now:not(.ok):not(.bad){color:var(--fg);box-shadow:inset 0 0 0 2px #999}
+.c.skip{background:#efefec;color:#b5b5b0}
+.c.pre{background:var(--prebg);color:var(--pre)}
+.c.suf{background:var(--sufbg);color:var(--suf)}
+.c.pre.suf{background:linear-gradient(135deg,var(--prebg) 50%,var(--sufbg) 50%);color:var(--fg)}
+.c.dim{opacity:.35}
+.click{cursor:pointer}
+.c.sel{box-shadow:inset 0 0 0 2px var(--pre);background:var(--prebg);color:var(--pre)}
+.c.use{box-shadow:inset 0 0 0 2px var(--suf);background:var(--sufbg);color:var(--suf)}
+.gap{height:14px}
+.msg{min-height:48px;font-size:14px;margin:6px 0 0}
+.msg .k{font:600 14px ui-monospace,Menlo,monospace}
+.msg .g{color:var(--ok);font-weight:600}.msg .r{color:var(--bad);font-weight:600}
+.tag{display:inline-block;padding:0 7px;border-radius:4px;font-size:12px;margin-right:6px}
+.tag.pre{background:var(--prebg);color:var(--pre)}.tag.suf{background:var(--sufbg);color:var(--suf)}
+.stats{margin:8px 0 10px;display:grid;gap:4px}
+.bar{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--mute)}
+.bar span{width:40px}.bar b{width:34px;color:var(--fg);font-weight:600;text-align:right}
+.trk{flex:1;max-width:360px;height:6px;background:#ebebe7;border-radius:3px;overflow:hidden}
+.trk i{display:block;height:100%;width:0;transition:width .3s}
+</style>
+</head>
+<body>
+<main>
+<h1>KMP 字符串匹配</h1>
+<p class="sub">主串指针 <b>i</b> 永不回退；失配时只回退模式串指针 <b>j</b>。</p>
+
+<div class="inputs">
+  <label>模式串 P<input id="P" value="ABABCABAB" maxlength="14" spellcheck="false"></label>
+  <label>主串 T<input id="T" value="ABABDABACDABABCABAB" maxlength="30" spellcheck="false"></label>
+  <select id="pre" aria-label="示例"></select>
+</div>
+
+<section>
+  <h2>① 最长相等前后缀</h2>
+  <p class="hint">点击任一字符或 next 值。next[k] = P[0..k] 中，相等的真前缀与真后缀的最大长度。</p>
+  <div id="concept"></div>
+</section>
+
+<section>
+  <h2>② 构造 next 表<small>模式串与自身匹配</small></h2>
+  <p class="hint">上行是 P 作为“主串”，下行是滑动的 P。绿色 = 已相等的前缀与后缀。</p>
+  <div id="build"></div>
+</section>
+
+<section>
+  <h2>③ 匹配<small>i 只前进，j 依 next 回退</small></h2>
+  <p class="hint">绿 = 匹配，红 = 失配，灰 = 被跳过的起点，橙 = 正在查阅的 next 项。</p>
+  <div id="match"></div>
+</section>
+</main>
+
+<script>
+const CW=38,$=s=>document.querySelector(s);
+const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
+const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const kb=x=>`<b class="k">${esc(x)}</b>`;
+const strip=(s,cls)=>{const d=el('div','strip '+(cls||''));for(const ch of s)d.append(el('div','c',ch));return d};
+const line=(lab,st,sm)=>{const l=el('div','line'+(sm?' sm':''));const b=el('div','lab',lab);l.append(b,st);l.lab=b;return l};
+const numStrip=(n,cls)=>{const d=el('div','strip '+(cls||''));for(let k=0;k<n;k++)d.append(el('div','c',k));return d};
+
+const calcPi=p=>{const pi=[0];for(let i=1,j=0;i<p.length;i++){while(j&&p[i]!==p[j])j=pi[j-1];if(p[i]===p[j])j++;pi[i]=j}return pi};
+const brute=(T,P)=>{let c=0;for(let s=0;s+P.length<=T.length;s++)for(let k=0;k<P.length;k++){c++;if(T[s+k]!==P[k])break}return c};
+
+function matchFrames(T,P,pi){
+  const n=T.length,m=P.length,F=[],fs=[];let i=0,j=0,c=0;
+  const push=o=>F.push({c,fs:fs.slice(),...o});
+  push({t:'start',i,j});
+  while(i<n){
+    const ok=T[i]===P[j];c++;
+    push({t:'cmp',i,j,ok});
+    if(ok){
+      i++;j++;
+      if(j===m){
+        fs.push(i-m);push({t:'found',i,j,start:i-m});
+        const jt=pi[m-1];
+        if(i<n)push({t:'shift',i,jFrom:j,jTo:jt});
+        j=jt;
+      }
+    }else if(j>0){const jt=pi[j-1];push({t:'shift',i,jFrom:j,jTo:jt});j=jt}
+    else i++;
+  }
+  push({t:'end',i,j});
+  return F;
+}
+
+function buildFrames(P){
+  const m=P.length,F=[],pi=Array(m).fill(null);pi[0]=0;let i=1,j=0;
+  const push=o=>F.push({pi:pi.slice(),c:0,fs:[],...o});
+  push({t:'start',i,j,set:0});
+  while(i<m){
+    if(P[i]===P[j]){pi[i]=j+1;push({t:'cmp',i,j,ok:true,set:i});i++;j++}
+    else if(j>0){push({t:'cmp',i,j,ok:false});const jt=pi[j-1];push({t:'shift',i,jFrom:j,jTo:jt});j=jt}
+    else{pi[i]=0;push({t:'cmp',i,j,ok:false,set:i});i++}
+  }
+  push({t:'end',i,j});
+  return F;
+}
+
+function Viz(root,o){
+  root._stop&&root._stop();
+  root.innerHTML='';
+  const {top,pat,frames,mode}=o,n=top.length,m=pat.length,last=frames.length-1;
+  let idx=0,timer=null;
+
+  const ctl=el('div','ctl');
+  const btn=(t,f)=>{const b=el('button',null,t);b.onclick=f;ctl.append(b);return b};
+  btn('重置',()=>{stop();go(0)});
+  btn('‹ 上一步',()=>{stop();go(idx-1)});
+  btn('下一步 ›',()=>{stop();go(idx+1)});
+  const bPlay=btn('自动播放',()=>timer?stop():play());
+  const sp=el('select');[['慢',1200],['中',700],['快',300]].forEach(([t,v])=>sp.append(new Option(t,v)));sp.value=700;
+  sp.onchange=()=>{if(timer){stop();play()}};
+  const stepEl=el('span','step');
+  ctl.append(sp,stepEl);
+
+  const sc=el('div','scroll'),st=el('div','stage');
+  const idxS=numStrip(n,'idx'),mi=el('div','strip hide'),mj=el('div','strip hide');
+  const miC=el('div','mk'),mjC=el('div','mk');mi.append(miC);mj.append(mjC);
+  const tS=strip(top),pS=strip(pat);pS.classList.add('hide');
+  const kS=numStrip(m,'idx'),nS=strip('0'.repeat(m));
+  const tC=[...tS.children],pC=[...pS.children],nC=[...nS.children];
+  const labs=mode==='build'?['P','P 平移']:['主串 T','模式串 P'];
+  const gap=el('div','gap');
+  st.append(line('',idxS,1),line('',mi,1),line(labs[0],tS),line(labs[1],pS),line('',mj,1),gap,line('',kS,1),line('next',nS));
+  sc.append(st);
+
+  const msg=el('div','msg');
+  let stats=null,bK,bB,nK,nB;
+  const Bt=mode==='match'?brute(top,pat):0,Kt=frames[last].c,mx=Math.max(Bt,Kt,1);
+  if(mode==='match'){
+    stats=el('div','stats');
+    const row=(name,color)=>{const r=el('div','bar'),t=el('div','trk'),i=el('i'),b=el('b');i.style.background=color;t.append(i);r.append(el('span',null,name),t,b);stats.append(r);return[i,b]};
+    [bK,nK]=row('KMP','var(--ok)');[bB,nB]=row('暴力','#b9b9b3');
+    bB.style.width=(Bt/mx*100)+'%';nB.textContent=Bt;
+  }
+  root.append(ctl,sc,msg);if(stats)root.append(stats);
+
+  function text(f){
+    const {t,i}=f,arr=mode==='build'?f.pi:o.pi;
+    if(t==='start')return mode==='build'?`next[0] = 0。从 i=1, j=0 起，用 P 的前缀匹配 P 的后缀。`:'点击“下一步”开始。';
+    if(t==='cmp'){
+      const a=kb(top[i]),b=kb(pat[f.j]);
+      if(f.ok)return `${mode==='build'?'P':'T'}[${i}] = ${a} = P[${f.j}] <span class="g">✓</span> → `+(mode==='build'?`next[${i}] = ${f.j+1}`:'i++, j++');
+      if(f.j>0)return `${a} ≠ ${b} <span class="r">✗</span> → 查 next[${f.j-1}] = ${arr[f.j-1]}，回退 j`;
+      return `${a} ≠ ${b} <span class="r">✗</span> → j 已为 0，`+(mode==='build'?`next[${i}] = 0`:'i++（模式串右移 1 位）');
+    }
+    if(t==='shift')return `j：${f.jFrom} → ${f.jTo}；模式串右移 ${f.jFrom-f.jTo} 位，前 ${f.jTo} 个字符无需重新比较`;
+    if(t==='found')return `<span class="g">匹配成功</span>，起点 ${f.start}`;
+    return mode==='build'?'next 表构造完成。':(f.fs.length?`完成：匹配起点 ${f.fs.join(', ')}`:'完成：未找到匹配');
+  }
+
+  function draw(){
+    const f=frames[idx],{t,i}=f,jj=t==='shift'?f.jTo:f.j;
+    const tc=Array(n).fill('c'),pc=Array(m).fill('c');
+    const add=(a,k,c)=>{if(k>=0&&k<a.length)a[k]+=' '+c};
+    f.fs.forEach(s=>{for(let k=s;k<s+m;k++)add(tc,k,'ok')});
+    if(t==='cmp'){
+      for(let k=i-jj;k<i;k++)add(tc,k,'ok');
+      for(let k=0;k<jj;k++)add(pc,k,'ok');
+      const s=f.ok?'ok now':'bad now';add(tc,i,s);add(pc,jj,s);
+    }else if(t==='shift'){
+      for(let k=i-f.jFrom;k<i-jj;k++)add(tc,k,'skip');
+      for(let k=i-jj;k<i;k++)add(tc,k,'ok');
+      for(let k=0;k<jj;k++)add(pc,k,'ok');
+      add(tc,i,'now');add(pc,jj,'now');
+    }else if(t==='found')pc.fill('c ok');
+    tC.forEach((c,k)=>c.className=tc[k]);pC.forEach((c,k)=>c.className=pc[k]);
+    pS.style.transform=`translateX(${(i-jj)*CW}px)`;
+    mi.style.transform=mj.style.transform=`translateX(${i*CW}px)`;
+    miC.textContent=`i=${i}`;mjC.textContent=`j=${jj}`;
+    [pS,mi,mj].forEach(x=>x.classList.toggle('hide',t==='start'&&mode==='match'||t==='end'));
+    const arr=mode==='build'?f.pi:o.pi;
+    const use=t==='shift'?f.jFrom-1:(t==='cmp'&&!f.ok&&f.j>0?f.j-1:-1);
+    nC.forEach((c,k)=>{c.textContent=arr[k]==null?'':arr[k];c.className='c'+(k===f.set?' sel':'')+(k===use?' use':'')});
+    msg.innerHTML=text(f);
+    stepEl.textContent=`${idx} / ${last}`;
+    if(stats){bK.style.width=(f.c/mx*100)+'%';nK.textContent=f.c}
+    sc.scrollTo({left:Math.max(0,(i+1)*CW-sc.clientWidth/2),behavior:'smooth'});
+  }
+  function go(k){idx=Math.max(0,Math.min(last,k));draw()}
+  function stop(){clearInterval(timer);timer=null;bPlay.textContent='自动播放'}
+  function play(){
+    if(idx>=last)go(0);
+    bPlay.textContent='暂停';
+    timer=setInterval(()=>{if(idx>=last)stop();else go(idx+1)},+sp.value);
+  }
+  root._stop=stop;
+  draw();
+}
+
+function concept(P,pi){
+  const root=$('#concept');root.innerHTML='';
+  const m=P.length;let k=pi.indexOf(Math.max(...pi));
+  const sc=el('div','scroll'),st=el('div','stage');
+  const pS=strip(P),qS=strip(P),nS=strip('0'.repeat(m)),kS=numStrip(m,'idx');
+  const pC=[...pS.children],qC=[...qS.children],nC=[...nS.children];
+  const ql=line('',qS);
+  st.append(line('',kS,1),line('P',pS),ql,el('div','gap'),line('next',nS));
+  sc.append(st);
+  const msg=el('div','msg');root.append(sc,msg);
+  pC.forEach((c,x)=>c.onclick=()=>{k=x;draw()});
+  nC.forEach((c,x)=>c.onclick=()=>{k=x;draw()});
+  function draw(){
+    const b=pi[k],s=k+1-b;
+    pC.forEach((c,x)=>{let cl='c click';if(x>k)cl+=' dim';else{if(x<b)cl+=' pre';if(x>k-b)cl+=' suf'}c.className=cl});
+    qC.forEach((c,x)=>c.className='c'+(x<b?' pre':' dim'));
+    qS.style.transform=`translateX(${s*CW}px)`;
+    ql.lab.textContent=`右移 ${s}`;
+    nC.forEach((c,x)=>{c.textContent=pi[x];c.className='c click'+(x===k?' sel':'')});
+    const head=`P[0..${k}] = ${kb(P.slice(0,k+1))}`;
+    msg.innerHTML=b
+      ?`${head}　<span class="tag pre">前缀</span><span class="tag suf">后缀</span>${kb(P.slice(0,b))}，next[${k}] = ${b}<br>若紧接着失配：模式串右移 ${s} 位，前 ${b} 个字符无需重比`
+      :`${head}　无相等的真前缀与真后缀，next[${k}] = 0<br>若紧接着失配：模式串右移 ${s} 位，从头比较`;
+  }
+  draw();
+}
+
+const PRESETS=[
+  ['示例：经典','ABABDABACDABABCABAB','ABABCABAB'],
+  ['示例：暴力法最坏情形','AAAAAAAAAAAAAAAB','AAAAB'],
+  ['示例：多处匹配','ABCABCABCABCAB','ABCAB'],
+  ['示例：无匹配','ABCDEFGHIJKLMNO','ABCE']
+];
+PRESETS.forEach(([n],i)=>$('#pre').append(new Option(n,i)));
+$('#pre').onchange=e=>{const[,T,P]=PRESETS[e.target.value];$('#T').value=T;$('#P').value=P;refresh()};
+
+function refresh(){
+  const P=$('#P').value,T=$('#T').value;
+  ['#concept','#build','#match'].forEach(s=>{$(s)._stop&&$(s)._stop();$(s).innerHTML=''});
+  if(!P||!T)return;
+  const pi=calcPi(P);
+  concept(P,pi);
+  Viz($('#build'),{top:P,pat:P,frames:buildFrames(P),mode:'build'});
+  Viz($('#match'),{top:T,pat:P,frames:matchFrames(T,P,pi),pi,mode:'match'});
+}
+$('#P').oninput=$('#T').oninput=refresh;
+refresh();
+</script>
+</body>
+</html>
