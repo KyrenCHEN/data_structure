@@ -75,14 +75,14 @@ transition:background .2s,color .2s}
 </div>
 
 <section>
-  <h2>① 最长相等前后缀</h2>
-  <p class="hint">点击任一字符或 next 值。next[k] = P[0..k] 中，相等的真前缀与真后缀的最大长度。</p>
+  <h2>① next[j] 的含义</h2>
+  <p class="hint">点击任一位置 j。next[j] = k ⇔ P[1..k-1] = P[j-k+1..j-1]，k−1 为 P[1..j-1] 的最长相等前后缀长度。</p>
   <div id="concept"></div>
 </section>
 
 <section>
   <h2>② 构造 next 表<small>模式串与自身匹配</small></h2>
-  <p class="hint">上行是 P 作为“主串”，下行是滑动的 P。绿色 = 已相等的前缀与后缀。</p>
+  <p class="hint">t<sub>j</sub> = t<sub>k</sub>：next[j+1] = k+1；否则 k = next[k]。上行 P 作主串，下行 P 滑动。</p>
   <div id="build"></div>
 </section>
 
@@ -100,50 +100,60 @@ const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[
 const kb=x=>`<b class="k">${esc(x)}</b>`;
 const strip=(s,cls)=>{const d=el('div','strip '+(cls||''));for(const ch of s)d.append(el('div','c',ch));return d};
 const line=(lab,st,sm)=>{const l=el('div','line'+(sm?' sm':''));const b=el('div','lab',lab);l.append(b,st);l.lab=b;return l};
-const numStrip=(n,cls)=>{const d=el('div','strip '+(cls||''));for(let k=0;k<n;k++)d.append(el('div','c',k));return d};
+const numStrip=(n,cls)=>{const d=el('div','strip '+(cls||''));for(let k=1;k<=n;k++)d.append(el('div','c',k));return d};
 
-const calcPi=p=>{const pi=[0];for(let i=1,j=0;i<p.length;i++){while(j&&p[i]!==p[j])j=pi[j-1];if(p[i]===p[j])j++;pi[i]=j}return pi};
+// 教材 next：下标从 1 起；nx[j-1] = next[j]，长度 m+1（含 next[m+1]，用于找到匹配后继续）
+const calcNext=p=>{const pi=[0];for(let i=1,j=0;i<p.length;i++){while(j&&p[i]!==p[j])j=pi[j-1];if(p[i]===p[j])j++;pi[i]=j}return[0,...pi.map(v=>v+1)]};
 const brute=(T,P)=>{let c=0;for(let s=0;s+P.length<=T.length;s++)for(let k=0;k<P.length;k++){c++;if(T[s+k]!==P[k])break}return c};
 
-function matchFrames(T,P,pi){
-  const n=T.length,m=P.length,F=[],fs=[];let i=0,j=0,c=0;
+// 帧中 i、j 均为 1 起的下标；j=0 表示 next 回退到 0
+function matchFrames(T,P,nx){
+  const n=T.length,m=P.length,F=[],fs=[];let i=1,j=1,c=0;
   const push=o=>F.push({c,fs:fs.slice(),...o});
   push({t:'start',i,j});
-  while(i<n){
-    const ok=T[i]===P[j];c++;
+  while(i<=n){
+    const ok=T[i-1]===P[j-1];c++;
     push({t:'cmp',i,j,ok});
     if(ok){
       i++;j++;
-      if(j===m){
+      if(j>m){
         fs.push(i-m);push({t:'found',i,j,start:i-m});
-        const jt=pi[m-1];
-        if(i<n)push({t:'shift',i,jFrom:j,jTo:jt});
+        const jt=nx[m];
+        if(i<=n)push({t:'shift',i,jFrom:j,jTo:jt});
         j=jt;
       }
-    }else if(j>0){const jt=pi[j-1];push({t:'shift',i,jFrom:j,jTo:jt});j=jt}
-    else i++;
+    }else{
+      const jt=nx[j-1];push({t:'shift',i,jFrom:j,jTo:jt});j=jt;
+      if(j===0){i++;j=1}
+    }
   }
   push({t:'end',i,j});
   return F;
 }
 
 function buildFrames(P){
-  const m=P.length,F=[],pi=Array(m).fill(null);pi[0]=0;let i=1,j=0;
-  const push=o=>F.push({pi:pi.slice(),c:0,fs:[],...o});
-  push({t:'start',i,j,set:0});
-  while(i<m){
-    if(P[i]===P[j]){pi[i]=j+1;push({t:'cmp',i,j,ok:true,set:i});i++;j++}
-    else if(j>0){push({t:'cmp',i,j,ok:false});const jt=pi[j-1];push({t:'shift',i,jFrom:j,jTo:jt});j=jt}
-    else{pi[i]=0;push({t:'cmp',i,j,ok:false,set:i});i++}
+  const m=P.length,F=[],nx=Array(m).fill(null);nx[0]=0;
+  const push=o=>F.push({nx:nx.slice(),c:0,fs:[],...o});
+  if(m>1)nx[1]=1;
+  push({t:'start',i:1,j:0,set:m>1?1:0});
+  let j=2,k=1;
+  while(j<m){
+    if(P[j-1]===P[k-1]){nx[j]=k+1;push({t:'cmp',i:j,j:k,ok:true,set:j});j++;k++}
+    else{
+      push({t:'cmp',i:j,j:k,ok:false});
+      const kk=nx[k-1];
+      if(kk===0){nx[j]=1;push({t:'shift',i:j,jFrom:k,jTo:0,set:j});j++;k=1}
+      else{push({t:'shift',i:j,jFrom:k,jTo:kk});k=kk}
+    }
   }
-  push({t:'end',i,j});
+  push({t:'end',i:j,j:k});
   return F;
 }
 
 function Viz(root,o){
   root._stop&&root._stop();
   root.innerHTML='';
-  const {top,pat,frames,mode}=o,n=top.length,m=pat.length,last=frames.length-1;
+  const {top,pat,frames,mode}=o,n=top.length,m=pat.length,last=frames.length-1,B=mode==='build';
   let idx=0,timer=null;
 
   const ctl=el('div','ctl');
@@ -163,15 +173,14 @@ function Viz(root,o){
   const tS=strip(top),pS=strip(pat);pS.classList.add('hide');
   const kS=numStrip(m,'idx'),nS=strip('0'.repeat(m));
   const tC=[...tS.children],pC=[...pS.children],nC=[...nS.children];
-  const labs=mode==='build'?['P','P 平移']:['主串 T','模式串 P'];
-  const gap=el('div','gap');
-  st.append(line('',idxS,1),line('',mi,1),line(labs[0],tS),line(labs[1],pS),line('',mj,1),gap,line('',kS,1),line('next',nS));
+  const labs=B?['P (j)','P 平移 (k)']:['主串 T','模式串 P'];
+  st.append(line('',idxS,1),line('',mi,1),line(labs[0],tS),line(labs[1],pS),line('',mj,1),el('div','gap'),line('j',kS,1),line('next[j]',nS));
   sc.append(st);
 
   const msg=el('div','msg');
   let stats=null,bK,bB,nK,nB;
-  const Bt=mode==='match'?brute(top,pat):0,Kt=frames[last].c,mx=Math.max(Bt,Kt,1);
-  if(mode==='match'){
+  const Bt=B?0:brute(top,pat),Kt=frames[last].c,mx=Math.max(Bt,Kt,1);
+  if(!B){
     stats=el('div','stats');
     const row=(name,color)=>{const r=el('div','bar'),t=el('div','trk'),i=el('i'),b=el('b');i.style.background=color;t.append(i);r.append(el('span',null,name),t,b);stats.append(r);return[i,b]};
     [bK,nK]=row('KMP','var(--ok)');[bB,nB]=row('暴力','#b9b9b3');
@@ -180,46 +189,49 @@ function Viz(root,o){
   root.append(ctl,sc,msg);if(stats)root.append(stats);
 
   function text(f){
-    const {t,i}=f,arr=mode==='build'?f.pi:o.pi;
-    if(t==='start')return mode==='build'?`next[0] = 0。从 i=1, j=0 起，用 P 的前缀匹配 P 的后缀。`:'点击“下一步”开始。';
+    const {t,i}=f,arr=B?f.nx:o.nx,X=B?'P':'T',p=B?'k':'j';
+    if(t==='start')return B?`next[1] = 0；k=0 时 next[2] = 1，取 j=2, k=1。`:'点击“下一步”开始。';
     if(t==='cmp'){
-      const a=kb(top[i]),b=kb(pat[f.j]);
-      if(f.ok)return `${mode==='build'?'P':'T'}[${i}] = ${a} = P[${f.j}] <span class="g">✓</span> → `+(mode==='build'?`next[${i}] = ${f.j+1}`:'i++, j++');
-      if(f.j>0)return `${a} ≠ ${b} <span class="r">✗</span> → 查 next[${f.j-1}] = ${arr[f.j-1]}，回退 j`;
-      return `${a} ≠ ${b} <span class="r">✗</span> → j 已为 0，`+(mode==='build'?`next[${i}] = 0`:'i++（模式串右移 1 位）');
+      const a=kb(top[i-1]),b=kb(pat[f.j-1]);
+      if(f.ok)return `${X}[${i}] = ${a} = P[${f.j}] <span class="g">✓</span> → `+(B?`next[${i+1}] = ${f.j+1}，j++, k++`:'i++, j++');
+      return `${a} ≠ ${b} <span class="r">✗</span> → ${p} = next[${f.j}] = ${arr[f.j-1]}`;
     }
-    if(t==='shift')return `j：${f.jFrom} → ${f.jTo}；模式串右移 ${f.jFrom-f.jTo} 位，前 ${f.jTo} 个字符无需重新比较`;
+    if(t==='shift'){
+      if(f.jTo===0)return B?`k = 0 → next[${i+1}] = 1，j++, k=1`:`j = 0 → i++, j=1（模式右移 1 位）`;
+      return `${p}：${f.jFrom} → ${f.jTo}；模式右移 ${f.jFrom-f.jTo} 位，前 ${f.jTo-1} 个字符无需重比`;
+    }
     if(t==='found')return `<span class="g">匹配成功</span>，起点 ${f.start}`;
-    return mode==='build'?'next 表构造完成。':(f.fs.length?`完成：匹配起点 ${f.fs.join(', ')}`:'完成：未找到匹配');
+    return B?'next 表构造完成。':(f.fs.length?`完成：匹配起点 ${f.fs.join(', ')}`:'完成：未找到匹配');
   }
 
   function draw(){
-    const f=frames[idx],{t,i}=f,jj=t==='shift'?f.jTo:f.j;
+    const f=frames[idx],t=f.t,ci=f.i-1,jj=t==='shift'?f.jTo:f.j,b=jj-1,off=ci-b;
     const tc=Array(n).fill('c'),pc=Array(m).fill('c');
     const add=(a,k,c)=>{if(k>=0&&k<a.length)a[k]+=' '+c};
-    f.fs.forEach(s=>{for(let k=s;k<s+m;k++)add(tc,k,'ok')});
+    f.fs.forEach(s=>{for(let k=s-1;k<s-1+m;k++)add(tc,k,'ok')});
     if(t==='cmp'){
-      for(let k=i-jj;k<i;k++)add(tc,k,'ok');
-      for(let k=0;k<jj;k++)add(pc,k,'ok');
-      const s=f.ok?'ok now':'bad now';add(tc,i,s);add(pc,jj,s);
+      for(let k=ci-b;k<ci;k++)add(tc,k,'ok');
+      for(let k=0;k<b;k++)add(pc,k,'ok');
+      const s=f.ok?'ok now':'bad now';add(tc,ci,s);add(pc,b,s);
     }else if(t==='shift'){
-      for(let k=i-f.jFrom;k<i-jj;k++)add(tc,k,'skip');
-      for(let k=i-jj;k<i;k++)add(tc,k,'ok');
-      for(let k=0;k<jj;k++)add(pc,k,'ok');
-      add(tc,i,'now');add(pc,jj,'now');
+      const a=f.jFrom-1;
+      for(let k=ci-a;k<ci-Math.max(b,0);k++)add(tc,k,'skip');
+      for(let k=ci-b;k<ci;k++)add(tc,k,'ok');
+      for(let k=0;k<b;k++)add(pc,k,'ok');
+      add(tc,ci,'now');add(pc,b,'now');
     }else if(t==='found')pc.fill('c ok');
     tC.forEach((c,k)=>c.className=tc[k]);pC.forEach((c,k)=>c.className=pc[k]);
-    pS.style.transform=`translateX(${(i-jj)*CW}px)`;
-    mi.style.transform=mj.style.transform=`translateX(${i*CW}px)`;
-    miC.textContent=`i=${i}`;mjC.textContent=`j=${jj}`;
-    [pS,mi,mj].forEach(x=>x.classList.toggle('hide',t==='start'&&mode==='match'||t==='end'));
-    const arr=mode==='build'?f.pi:o.pi;
-    const use=t==='shift'?f.jFrom-1:(t==='cmp'&&!f.ok&&f.j>0?f.j-1:-1);
+    pS.style.transform=`translateX(${off*CW}px)`;
+    mi.style.transform=mj.style.transform=`translateX(${ci*CW}px)`;
+    miC.textContent=`${B?'j':'i'}=${f.i}`;mjC.textContent=`${B?'k':'j'}=${jj}`;
+    [pS,mi,mj].forEach(x=>x.classList.toggle('hide',t==='start'&&!B||t==='end'));
+    const arr=B?f.nx:o.nx;
+    const use=t==='shift'?f.jFrom-1:(t==='cmp'&&!f.ok?f.j-1:-1);
     nC.forEach((c,k)=>{c.textContent=arr[k]==null?'':arr[k];c.className='c'+(k===f.set?' sel':'')+(k===use?' use':'')});
     msg.innerHTML=text(f);
     stepEl.textContent=`${idx} / ${last}`;
     if(stats){bK.style.width=(f.c/mx*100)+'%';nK.textContent=f.c}
-    sc.scrollTo({left:Math.max(0,(i+1)*CW-sc.clientWidth/2),behavior:'smooth'});
+    sc.scrollTo({left:Math.max(0,(ci+1)*CW-sc.clientWidth/2),behavior:'smooth'});
   }
   function go(k){idx=Math.max(0,Math.min(last,k));draw()}
   function stop(){clearInterval(timer);timer=null;bPlay.textContent='自动播放'}
@@ -232,29 +244,35 @@ function Viz(root,o){
   draw();
 }
 
-function concept(P,pi){
+function concept(P,nx){
   const root=$('#concept');root.innerHTML='';
-  const m=P.length;let k=pi.indexOf(Math.max(...pi));
+  const m=P.length;let j=1+nx.slice(0,m).indexOf(Math.max(...nx.slice(0,m)));
   const sc=el('div','scroll'),st=el('div','stage');
   const pS=strip(P),qS=strip(P),nS=strip('0'.repeat(m)),kS=numStrip(m,'idx');
   const pC=[...pS.children],qC=[...qS.children],nC=[...nS.children];
   const ql=line('',qS);
-  st.append(line('',kS,1),line('P',pS),ql,el('div','gap'),line('next',nS));
+  st.append(line('j',kS,1),line('P',pS),ql,el('div','gap'),line('next[j]',nS));
   sc.append(st);
   const msg=el('div','msg');root.append(sc,msg);
-  pC.forEach((c,x)=>c.onclick=()=>{k=x;draw()});
-  nC.forEach((c,x)=>c.onclick=()=>{k=x;draw()});
+  pC.forEach((c,x)=>c.onclick=()=>{j=x+1;draw()});
+  nC.forEach((c,x)=>c.onclick=()=>{j=x+1;draw()});
   function draw(){
-    const b=pi[k],s=k+1-b;
-    pC.forEach((c,x)=>{let cl='c click';if(x>k)cl+=' dim';else{if(x<b)cl+=' pre';if(x>k-b)cl+=' suf'}c.className=cl});
-    qC.forEach((c,x)=>c.className='c'+(x<b?' pre':' dim'));
+    const k=nx[j-1],b=Math.max(k-1,0),s=j-k;
+    pC.forEach((c,x)=>{
+      let cl='c click';
+      if(x===j-1)cl+=' bad';else if(x>j-1)cl+=' dim';
+      else{if(x<b)cl+=' pre';if(x>=j-1-b)cl+=' suf'}
+      c.className=cl;
+    });
+    qC.forEach((c,x)=>c.className='c'+(x<b?' pre':x===b?' now':' dim'));
     qS.style.transform=`translateX(${s*CW}px)`;
-    ql.lab.textContent=`右移 ${s}`;
-    nC.forEach((c,x)=>{c.textContent=pi[x];c.className='c click'+(x===k?' sel':'')});
-    const head=`P[0..${k}] = ${kb(P.slice(0,k+1))}`;
+    qS.classList.toggle('hide',j===1);ql.lab.textContent=j===1?'':`右移 ${s}`;
+    nC.forEach((c,x)=>{c.textContent=nx[x];c.className='c click'+(x===j-1?' sel':'')});
+    if(j===1){msg.innerHTML=`next[1] = 0：在 P[1] 处失配，无可回退，主串指针 i 直接前进。`;return}
+    const head=`P[1..${j-1}] = ${kb(P.slice(0,j-1))}`;
     msg.innerHTML=b
-      ?`${head}　<span class="tag pre">前缀</span><span class="tag suf">后缀</span>${kb(P.slice(0,b))}，next[${k}] = ${b}<br>若紧接着失配：模式串右移 ${s} 位，前 ${b} 个字符无需重比`
-      :`${head}　无相等的真前缀与真后缀，next[${k}] = 0<br>若紧接着失配：模式串右移 ${s} 位，从头比较`;
+      ?`${head}　<span class="tag pre">前缀</span><span class="tag suf">后缀</span>${kb(P.slice(0,b))}（长 ${b}）→ next[${j}] = ${b}+1 = ${k}<br>在 P[${j}] 处失配：用 P[${k}] 继续比较，模式右移 ${s} 位`
+      :`${head}　无相等的真前缀与真后缀 → next[${j}] = 1<br>在 P[${j}] 处失配：用 P[1] 继续比较，模式右移 ${s} 位`;
   }
   draw();
 }
@@ -272,10 +290,10 @@ function refresh(){
   const P=$('#P').value,T=$('#T').value;
   ['#concept','#build','#match'].forEach(s=>{$(s)._stop&&$(s)._stop();$(s).innerHTML=''});
   if(!P||!T)return;
-  const pi=calcPi(P);
-  concept(P,pi);
+  const nx=calcNext(P);
+  concept(P,nx);
   Viz($('#build'),{top:P,pat:P,frames:buildFrames(P),mode:'build'});
-  Viz($('#match'),{top:T,pat:P,frames:matchFrames(T,P,pi),pi,mode:'match'});
+  Viz($('#match'),{top:T,pat:P,frames:matchFrames(T,P,nx),nx,mode:'match'});
 }
 $('#P').oninput=$('#T').oninput=refresh;
 refresh();
