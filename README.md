@@ -7,7 +7,7 @@
 - Python 平台：[`platform-python/`](platform-python/)
 - C 平台：[`platform-c/`](platform-c/)
 
-两版平台均已包含 `E0` 组件演示（新插件模板，含可视化）和 `E1`（递归/汉诺塔）示例插件，作为学生编写自己插件的参照实现。
+两版平台都带一个空白模板（`template/`，复制去写自己的插件）和两个完整示例：`plugins/example_insert`（顺序表插入，含可视化）、`plugins/example_recursion`（汉诺塔，不需要可视化）。
 
 ## 界面预览（Python 版）
 

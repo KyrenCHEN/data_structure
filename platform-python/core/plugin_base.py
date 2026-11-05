@@ -9,8 +9,8 @@
 2. category 填实验编号，例如 "E1"——同一次课的插件会被放进同一个菜单；
 3. 重写 run(text, vis)：自己解析 text，执行算法，可选调用 vis 画图，最后 return 一段字符串。
 
-不知道从哪里下手？直接看 plugins/example_demo/plugin.py，那是一个把所有能用的
-组件（文本解析、数组方格、柱状图、图）都演示了一遍的模板，复制改名就能用。
+空白模板在 template/plugin.py，复制改名就能用；完整示例看
+plugins/example_insert/plugin.py（顺序表插入，含可视化）。
 """
 
 
