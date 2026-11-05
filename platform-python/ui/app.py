@@ -3,13 +3,15 @@
 整体布局：
   顶部：菜单栏——一次课的插件放在同一个菜单里（按 category 分组）
   左侧：选中某个插件后出现的面板——插件说明 + 文本输入框 + 按钮
-  中间：一个大大的输出框，显示运行结果（纯文本）
+  中间上：可视化画布（数组方格 / 柱状图 / 图，插件可选使用）
+  中间下：输出框，显示运行结果（纯文本）
 """
 
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 
 from core.registry import registry
+from core.visual import Visualizer
 
 
 class PlatformApp(tk.Tk):
@@ -17,7 +19,7 @@ class PlatformApp(tk.Tk):
         super().__init__()
         self.reg = reg
         self.title("数据结构实验插件平台（Python）")
-        self.geometry("980x600")
+        self.geometry("980x680")
         self.current_plugin = None   # 当前选中的插件对象
 
         self._build_menu()
@@ -60,10 +62,16 @@ class PlatformApp(tk.Tk):
         self.run_btn = ttk.Button(left, text="运行", command=self._on_run, state=tk.DISABLED)
         self.run_btn.pack(anchor="w", padx=10, pady=(0, 10))
 
-        # ---------- 中间：大输出框 ----------
+        # ---------- 中间：画布（上）+ 输出框（下） ----------
         right = ttk.Frame(paned)
         paned.add(right, weight=3)
-        ttk.Label(right, text="输出", font=("", 12, "bold")).pack(anchor="w", padx=10, pady=(10, 4))
+
+        ttk.Label(right, text="可视化", font=("", 12, "bold")).pack(anchor="w", padx=10, pady=(10, 4))
+        self.canvas = tk.Canvas(right, height=260, bg="white", highlightthickness=1, highlightbackground="#ccc")
+        self.canvas.pack(fill=tk.X, padx=10, pady=(0, 10))
+        self.vis = Visualizer(self.canvas)
+
+        ttk.Label(right, text="输出", font=("", 12, "bold")).pack(anchor="w", padx=10, pady=(0, 4))
         self.output = tk.Text(right, wrap="word")
         self.output.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0, 10))
 
@@ -75,6 +83,7 @@ class PlatformApp(tk.Tk):
         self.run_btn.config(state=tk.NORMAL)
         self.input_box.delete("1.0", tk.END)
         self.output.delete("1.0", tk.END)
+        self.vis.clear()
 
     def _on_load_file(self):
         # 弹出文件选择框，把选中的 .txt 文件内容读进输入框
@@ -102,7 +111,7 @@ class PlatformApp(tk.Tk):
         text = self.input_box.get("1.0", tk.END)
 
         try:
-            result = self.current_plugin.run(text)
+            result = self.current_plugin.run(text, self.vis)
         except Exception as exc:
             # 插件内部出错也不能让整个平台崩溃，把错误信息显示出来即可
             result = f"[运行出错] {exc!r}"

@@ -258,8 +258,8 @@ footer code{background:var(--code-bg);padding:2px 6px;border-radius:5px;border:1
     <div class="pill-row">
       <span class="pill"><span class="dot"></span>Python 版 · Tkinter 图形界面</span>
       <span class="pill"><span class="dot c"></span>C 版 · dlopen 动态加载 + 文本菜单</span>
-      <span class="pill">输入输出统一用纯文本</span>
-      <span class="pill">示例插件：E1 汉诺塔（两版均含）</span>
+      <span class="pill">输入纯文本 · 输出纯文本 + 简易可视化</span>
+      <span class="pill">新插件模板：E0 组件演示（两版均含）</span>
     </div>
   </div>
 </header>
@@ -473,9 +473,10 @@ make run</pre>
       <div class="step">
         <div class="step-num">1</div>
         <div>
-          <h3>新建插件目录</h3>
-          <p>在 <code>plugins/</code> 下新建一个目录，命名建议带上算法名和学号后四位，避免和同学重名。</p>
-          <pre>plugins/kmp_1234/
+          <h3>复制模板目录</h3>
+          <p>不用从空文件写起——复制 <code>plugins/example_demo/</code> 整个目录，改个名字（建议带上算法名和学号后四位，避免和同学重名）。</p>
+          <pre><span class="cmt"># plugins/example_demo/ 复制为：</span>
+plugins/kmp_1234/
   plugin.py</pre>
         </div>
       </div>
@@ -500,9 +501,9 @@ make run</pre>
       <div class="step">
         <div class="step-num">3</div>
         <div>
-          <h3>实现 run(text)，返回字符串</h3>
-          <p><code>text</code> 是输入框里的全部内容，自己按约定的格式解析；不要用 <code>print()</code>，界面只展示 <code>return</code> 的内容。</p>
-          <pre>    <span class="kw">def</span> run(self, text):
+          <h3>实现 run(text, vis)，返回字符串</h3>
+          <p><code>text</code> 是输入框里的全部内容，自己按约定的格式解析；<code>vis</code> 是可选的画布工具，不需要画图就不用管它。不要用 <code>print()</code>，界面只展示 <code>return</code> 的内容。</p>
+          <pre>    <span class="kw">def</span> run(self, text, vis):
         text_str, pattern = text.strip().split(<span class="cmt">"\n"</span>)
         <span class="cmt"># ... 构造 next 数组、匹配 ...</span>
         <span class="kw">return</span> <span class="cmt">f"匹配位置: {positions}"</span></pre>

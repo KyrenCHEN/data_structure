@@ -16,7 +16,8 @@ class HanoiPlugin(Plugin):
     def example_input(self):
         return "4"
 
-    def run(self, text):
+    def run(self, text, vis):
+        vis.clear()  # 这个插件不需要画图，清空画布即可（避免残留上一个插件的画面）
         text = text.strip()  # 去掉输入框里可能带的换行/空格
         if not text.isdigit():
             return "输入不合法：请输入一个正整数，例如 4"
