@@ -1,11 +1,50 @@
 # 数据结构实验插件平台（C 版）
 
+不熟悉命令行？用 VSCode 打开这个文件夹，按 `F5` 即可自动编译并运行，详见 [`../docs/vscode_setup.md`](../docs/vscode_setup.md)。
+
+命令行方式：
 ```bash
 make run
 ```
 
-依赖：`gcc`、`make`、`dlopen`（Linux/macOS 原生支持；Windows 建议用 WSL）。
+依赖：`gcc`、`make`、`dlopen`（Linux/macOS 原生支持；Windows 必须用 WSL，原生 Windows 没有 `dlopen`）。
 
 插件为运行时动态加载的共享库（`.so`），核心程序改动无需重编译已有插件。
-插件接口规范、如何新增插件、常见问题：见 [`../docs/student_manual.md`](../docs/student_manual.md)。
-示例插件：[`plugins/example_recursion/recursion_plugin.c`](plugins/example_recursion/recursion_plugin.c)（E1.3 汉诺塔）。
+
+## 操作步骤
+
+1. 运行后会看到一个文本菜单，插件按实验编号连续排列（`E0` 是组件演示，分类会显示在插件名后面的括号里，如 `(E1)`）。
+2. 输入插件前面的编号并回车进入该插件。
+3. 按插件的提示输入一行文本，回车确认；可视化结果（数组方格/柱状图/图）和文字结果都直接打印在终端里。
+4. 回到菜单后可以输入 `0` 退出。
+
+```
+============ 数据结构实验插件平台（C） ============
+  [1] 平台组件演示（新插件模板） (E0)
+  [2] 汉诺塔求解（示例） (E1)
+  [0] 退出
+请输入编号: 1
+
+-- 平台组件演示（新插件模板） --
+依次演示数组方格、柱状图、图的邻接表画法，复制本目录开始写自己的插件。
+
+请输入一组数字，用逗号分隔（例如 5,3,8,1,9）: 5,3,8,1,9
+
+数组方格画法：
+   5    3    8    1    9
+  ^^
+ [ 0] [ 1] [ 2] [ 3] [ 4]
+
+柱状图画法：
+  5 | #####
+  3 | ###
+  8 | ########
+  1 | #
+  9 | #########
+
+最大值: 9  最小值: 1
+```
+
+插件接口规范、如何新增插件、可视化工具用法、常见问题：见 [`../docs/student_manual.md`](../docs/student_manual.md)。
+**新插件从这里开始**：[`plugins/example_demo/demo_plugin.c`](plugins/example_demo/demo_plugin.c)（E0，演示了数组方格/柱状图/图三种可视化画法，复制整个目录改名即可）。
+另附一个无需可视化的示例：[`plugins/example_recursion/recursion_plugin.c`](plugins/example_recursion/recursion_plugin.c)（E1 汉诺塔）。

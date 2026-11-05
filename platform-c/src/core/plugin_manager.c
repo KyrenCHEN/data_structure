@@ -3,11 +3,23 @@
 #include <dirent.h>
 #include <dlfcn.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 static int has_so_suffix(const char *filename) {
     size_t len = strlen(filename);
     return len > 3 && strcmp(filename + len - 3, ".so") == 0;
+}
+
+/* 按 category 再按 name 排序，和 Python 版菜单栏的分组顺序保持一致。 */
+static int compare_plugins(const void *a, const void *b) {
+    const LoadedPlugin *pa = (const LoadedPlugin *)a;
+    const LoadedPlugin *pb = (const LoadedPlugin *)b;
+    int cmp = strcmp(pa->info->category, pb->info->category);
+    if (cmp != 0) {
+        return cmp;
+    }
+    return strcmp(pa->info->name, pb->info->name);
 }
 
 int pm_load_dir(PluginManager *pm, const char *dir) {
@@ -58,6 +70,7 @@ int pm_load_dir(PluginManager *pm, const char *dir) {
     }
 
     closedir(d);
+    qsort(pm->items, (size_t)pm->count, sizeof(pm->items[0]), compare_plugins);
     return pm->count;
 }
 
