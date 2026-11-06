@@ -105,8 +105,9 @@ footer{padding:24px 0 40px;color:var(--muted);font-size:14px;}
   <div class="wrap">
     <h2>一、平台是怎么拼起来的</h2>
     <p>
-      核心程序只负责发现插件、渲染界面，不认识任何具体算法。插件通过统一接口挂进去，
-      核心程序在运行时扫描 <code>plugins/</code> 目录才知道它的存在。
+      核心程序只负责发现插件、渲染界面，不认识任何具体算法。插件通过统一接口挂进去：
+      Python 版启动时扫描 <code>plugins/</code> 目录；C 版编译时把 <code>plugins/</code>
+      下所有插件和核心代码一起编译进同一个可执行文件，没有动态库、没有运行时加载。
     </p>
 
     <div class="diagram">
@@ -136,16 +137,16 @@ footer{padding:24px 0 40px;color:var(--muted);font-size:14px;}
         <text x="105" y="223" text-anchor="middle" class="sub">example_insert</text>
 
         <rect x="280" y="100" width="180" height="70" class="box"></rect>
-        <text x="370" y="128" text-anchor="middle" class="lbl">加载器</text>
-        <text x="370" y="146" text-anchor="middle" class="sub">loader.py / plugin_manager.c</text>
+        <text x="370" y="128" text-anchor="middle" class="lbl">加载/注册</text>
+        <text x="370" y="146" text-anchor="middle" class="sub">main.py 扫描 / 编译时自动注册</text>
 
         <rect x="540" y="100" width="180" height="70" class="box"></rect>
-        <text x="630" y="128" text-anchor="middle" class="lbl">注册表</text>
-        <text x="630" y="146" text-anchor="middle" class="sub">按 category 分组持有实例</text>
+        <text x="630" y="128" text-anchor="middle" class="lbl">插件列表</text>
+        <text x="630" y="146" text-anchor="middle" class="sub">按 category 分组</text>
 
         <rect x="800" y="30" width="100" height="56" class="box"></rect>
         <text x="850" y="54" text-anchor="middle" class="lbl">图形界面</text>
-        <text x="850" y="71" text-anchor="middle" class="sub">ui/app.py</text>
+        <text x="850" y="71" text-anchor="middle" class="sub">app.py</text>
 
         <rect x="800" y="182" width="100" height="56" class="box"></rect>
         <text x="850" y="206" text-anchor="middle" class="lbl">文本菜单</text>
@@ -162,7 +163,7 @@ footer{padding:24px 0 40px;color:var(--muted);font-size:14px;}
         <text x="760" y="190" text-anchor="middle" class="sub">C</text>
       </svg>
     </div>
-    <p>核心部分（加载器、注册表、界面）由平台提供，学生不需要改；插件目录由学生各自新增，互不干扰。</p>
+    <p>核心部分（加载/注册、界面）由平台提供，学生不需要改；插件目录由学生各自新增，互不干扰。</p>
   </div>
 </section>
 
@@ -245,7 +246,7 @@ python3 main.py</code></pre>
     <h3>C 版</h3>
     <pre><code>cd platform-c
 make run</code></pre>
-    <p>插件各自编译为 <code>.so</code>，核心程序不需要重新编译即可加载新插件。</p>
+    <p>插件和核心代码一起编译成一个可执行文件，新增插件后重新 <code>make run</code> 一次就行，Windows 装 MinGW-w64 即可，不需要 WSL。</p>
   </div>
 </section>
 
@@ -262,7 +263,7 @@ plugins/kmp_1234/
 
     <h3>2. 继承 Plugin，写清楚输入格式</h3>
     <p>平台不解析输入，<code>description</code> 里写一句话说明格式，<code>example_input()</code> 给一个示例。</p>
-    <pre><code>from core.plugin_base import Plugin
+    <pre><code>from plugin_base import Plugin
 
 class KmpPlugin(Plugin):
     name = "KMP 字符串匹配"
@@ -280,7 +281,7 @@ class KmpPlugin(Plugin):
         return f"匹配位置: {positions}"</code></pre>
 
     <h3>4. 重新启动平台</h3>
-    <p>加载器会自动扫描 <code>plugins/</code>，不需要改任何核心文件，顶部菜单栏里会出现新插件分类。</p>
+    <p>重新运行 <code>main.py</code> 会自动扫描 <code>plugins/</code>，不需要改任何核心文件，顶部菜单栏里会出现新插件分类。C 版同理，重新 <code>make run</code> 即可，新插件编译时自动注册。</p>
 
     <h3>5. 用边界用例自测</h3>
     <p>至少验证一组正常输入和一组边界输入，比如空串、模式串比主串长，确认异常不会让平台崩溃。</p>
@@ -310,7 +311,7 @@ class KmpPlugin(Plugin):
 
     <div class="qa">
       <p class="q">插件没有出现在菜单里怎么办？</p>
-      <p class="a">Python 版检查文件名是否严格为 <code>plugin.py</code>、类是否直接继承 <code>Plugin</code>；C 版先看 <code>make</code> 是否报编译错误，再看运行时 <code>[plugin_manager]</code> 的报错信息。</p>
+      <p class="a">Python 版检查文件名是否严格为 <code>plugin.py</code>、类是否直接继承 <code>Plugin</code>；C 版先看 <code>make</code> 是否报编译错误，再检查插件文件里有没有漏写 <code>__attribute__((constructor))</code> 那个注册函数。</p>
     </div>
     <div class="qa">
       <p class="q">怎么表示数组、矩阵、树、图这类输入？</p>
@@ -318,7 +319,7 @@ class KmpPlugin(Plugin):
     </div>
     <div class="qa">
       <p class="q">C 版为什么是文本菜单，不是图形界面？</p>
-      <p class="a">C 原生做图形界面需要额外的 GUI 库，会把重心从数据结构挪到界面编程上。文本菜单同样能验证插件动态加载这个核心概念，在任意 Linux/macOS 环境零依赖运行。</p>
+      <p class="a">C 原生做图形界面需要额外的 GUI 库，会把重心从数据结构挪到界面编程上。文本菜单同样能体现"插件独立编写、统一接口接入平台"这个核心概念，在 Windows/Linux/macOS 上零依赖运行。</p>
     </div>
     <div class="qa">
       <p class="q">提交时要交哪些文件？</p>

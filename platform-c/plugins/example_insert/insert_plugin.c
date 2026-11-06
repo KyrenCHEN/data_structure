@@ -61,13 +61,12 @@ static void run(void) {
 }
 
 static const PluginInfo info = {
-    .abi_version = PLUGIN_ABI_VERSION,
     .name = "顺序表插入（示例）",
     .category = "E2",
     .description = "依次输入原数组、插入位置和插入值，演示顺序表插入操作。",
     .run = run,
 };
 
-const PluginInfo *plugin_get_info(void) {
-    return &info;
+static void __attribute__((constructor)) register_self(void) {
+    plugin_register(&info);
 }

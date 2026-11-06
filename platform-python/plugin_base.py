@@ -27,7 +27,7 @@ class Plugin:
 
     def run(self, text, vis):
         """text 是输入框里的全部内容（一整个字符串）。
-        vis 是画布工具（core/visual.py 的 Visualizer），不需要可视化就不用管它：
+        vis 是画布工具（visual.py 的 Visualizer），不需要可视化就不用管它：
             vis.draw_array([5, 3, 8, 1])     # 数组方格，适合数组/栈/队列/排序中间状态
             vis.draw_bars([5, 3, 8, 1])      # 柱状图，适合排序/查找过程
             vis.draw_graph(nodes, edges)     # 图：nodes 是节点名字列表，edges 是 (a, b) 元组列表

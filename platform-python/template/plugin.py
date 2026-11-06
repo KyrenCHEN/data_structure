@@ -8,7 +8,7 @@
 你复制用的。
 """
 
-from core.plugin_base import Plugin
+from plugin_base import Plugin
 
 
 class MyPlugin(Plugin):

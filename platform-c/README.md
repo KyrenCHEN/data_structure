@@ -7,9 +7,9 @@
 make run
 ```
 
-依赖 `gcc`、`make`。Linux/macOS 上 `dlopen` 是系统自带的，Windows 必须用 WSL，原生 Windows 没有 `dlopen`。
+依赖 `gcc`、`make`。Windows 装一个 MinGW-w64 编译器即可，不需要 WSL，三大平台编译命令完全一样。
 
-插件是运行时动态加载的共享库（`.so`），核心程序改动不需要重新编译已有插件。
+插件和核心代码一起编译成一个可执行文件，没有动态库、没有运行时加载；新增或改动插件后重新 `make run` 一次就行。
 
 ## 操作步骤
 

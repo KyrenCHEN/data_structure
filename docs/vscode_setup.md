@@ -44,49 +44,34 @@
 
 ## 2. C 平台配置
 
-C 平台依赖 Linux/macOS 才有的 `dlopen`（动态加载共享库）能力，**Windows 无法直接编译**，必须通过 WSL（Windows 里内置的 Linux 子系统）。
+插件和核心代码一起编译成一个可执行文件，不涉及任何动态库，Windows / macOS / Linux 装好编译器之后操作完全一样，**不需要 WSL**。
 
-### 2.1 macOS / Linux 用户
+### 2.1 安装编译器
 
-1. 安装命令行工具：
-   - macOS：打开终端执行一次 `xcode-select --install`（弹出的安装向导点安装即可，只需做一次）。
-   - Linux：执行一次 `sudo apt install build-essential gdb`（Ubuntu/Debian 系）。
-2. VSCode 中 `文件 → 打开文件夹`，选中 `platform-c` 文件夹。
-3. 安装推荐扩展：右下角提示安装，或手动搜索安装 **C/C++**（发布者 Microsoft）。
-4. 按 `F5`：VSCode 会自动先执行"编译平台和插件"任务（等价于 `make`），再启动程序，直接在下方的"终端"面板里看到文本菜单。
+- **Windows**：安装 MinGW-w64。最简单的方式是装 [MSYS2](https://www.msys2.org/)（跟着官网首页步骤装完），打开它自带的终端执行一次：
+  ```
+  pacman -S mingw-w64-ucrt-x86_64-gcc
+  ```
+  然后把安装路径下的 `ucrt64\bin` 目录加进系统环境变量 PATH（MSYS2 官网安装步骤最后一步会提示怎么做）。只需要做一次。
+- **macOS**：打开终端执行一次 `xcode-select --install`（弹出的安装向导点安装即可）。
+- **Linux**：执行一次 `sudo apt install build-essential gdb`（Ubuntu/Debian 系）。
 
-### 2.2 Windows 用户（通过 WSL）
+### 2.2 打开项目、运行
 
-1. 以**管理员身份**打开 PowerShell，执行一次：
-   ```
-   wsl --install
-   ```
-   按提示重启电脑。重启后会自动打开 Ubuntu 安装窗口，设置一个用户名和密码（这一步只做一次）。
-
-2. 在 VSCode 里安装扩展 **WSL**（发布者 Microsoft）。
-
-3. 按 `Ctrl+Shift+P`，输入 `WSL: Connect to WSL`，回车。VSCode 窗口左下角会显示 "WSL"，表示现在是在 Linux 环境里操作。
-
-4. 在这个 WSL 窗口里，用 `文件 → 打开文件夹`，浏览到你把仓库拷贝到 WSL 文件系统里的位置（建议直接把整个仓库放在 WSL 的家目录下，而不是 `C:\` 盘下，编译速度更快、路径也更少出问题），选中 `platform-c` 文件夹。
-
-5. 打开 VSCode 内置的"终端"面板（`终端 → 新建终端`），这一步**唯一**需要手动敲一条命令，装好编译工具（只需要做一次）：
-   ```
-   sudo apt update && sudo apt install -y build-essential gdb
-   ```
-
-6. 安装推荐扩展 **C/C++**（在 WSL 窗口里重新装一次，因为扩展是按窗口环境区分的）。
-
-7. 之后和 macOS/Linux 一样，按 `F5` 即可编译+运行，不再需要手动敲命令。
+1. VSCode 中 `文件 → 打开文件夹`，选中 `platform-c` 文件夹。
+2. 安装推荐扩展：右下角提示安装，或手动搜索安装 **C/C++**（发布者 Microsoft）。
+3. 按 `F5`：VSCode 会自动先执行"编译平台"任务（等价于 `make`），再启动程序，直接在下方的"终端"面板里看到文本菜单。
 
 ### 2.3 运行效果
 
 按 `F5` 后，下方"终端"面板会显示：
 
 ```
-[main] 已从 plugins_bin 加载 1 个插件
+[main] 已加载 2 个插件
 
 ============ 数据结构实验插件平台（C） ============
-  [1] 汉诺塔求解（示例） (E1.3 递归算法)
+  [1] 汉诺塔求解（示例） (E1)
+  [2] 顺序表插入（示例） (E2)
   [0] 退出
 请输入编号:
 ```
@@ -97,7 +82,6 @@ C 平台依赖 Linux/macOS 才有的 `dlopen`（动态加载共享库）能力�
 
 ## 3. 新增自己的插件后要做什么
 
-- Python 版：直接重新按 `F5`（或点▶）即可，加载器会自动扫描新目录。
-- C 版：同样直接按 `F5`，VSCode 会先自动重新执行 `make`（会自动发现 `plugins/` 下新增的目录并编译），再运行。
-
-两种情况都**不需要**手动修改 `.vscode/` 里的任何配置文件。
+两版都一样：写完插件代码后直接重新按 `F5`（或点▶）即可，不需要改任何配置文件。
+- Python 版：重新运行时会自动扫描 `plugins/` 下的新目录。
+- C 版：会自动重新编译（`Makefile` 会发现 `plugins/` 下新增的目录并一起编译进去），再运行。

@@ -12,7 +12,7 @@
 2. 打开复制出来的文件，把里面的 TODO 换成你自己的算法逻辑。
 3. 重新打开平台，菜单里会自动出现你的插件，点开、输入测试数据、运行，看结果对不对。
 
-平台里其余的文件（`core/`、`ui/`、`src/core/`、`src/ui/`）不用打开。
+平台里其余的文件（`main.py`、`app.py`、`plugin_base.py`、`visual.py`，C 版对应 `main.c`、`menu_ui.c`、`plugin_registry.c`、`plugin.h`、`visual.h`）不用打开。
 
 不知道代码应该写成什么样子，可以先看 `plugins/example_insert/`，这是一个完整实现的例子（顺序表插入），照着这个结构写就行。
 
@@ -20,25 +20,29 @@
 
 ```
 platform-python/
-  core/                           框架代码，不用修改
-  ui/app.py                       图形界面：顶部菜单栏 + 左侧输入面板 + 中间画布/输出框
+  main.py                         启动入口：扫描 plugins/，启动界面
+  app.py                          图形界面：顶部菜单栏 + 左侧输入面板 + 中间画布/输出框
+  plugin_base.py                  Plugin 基类
+  visual.py                       可视化工具
   template/plugin.py              空白模板，复制它去 plugins/ 下新建自己的插件
   plugins/example_insert/plugin.py     完整示例：顺序表插入
   plugins/example_recursion/plugin.py  完整示例：汉诺塔（递归）
   plugins/<你的插件目录>/plugin.py
-  main.py                         启动入口
 
 platform-c/
-  include/plugin.h                插件接口定义
-  include/visual.h                可视化工具，直接 #include 使用
-  src/                            框架代码，不用修改
+  main.c                          启动入口
+  menu_ui.c                       文本菜单界面
+  plugin_registry.c               插件注册表
+  plugin.h                        插件接口定义
+  visual.h                        可视化工具，直接 #include 使用
   template/plugin_template.c      空白模板，复制它去 plugins/ 下新建自己的插件
   plugins/example_insert/insert_plugin.c       完整示例：顺序表插入
   plugins/example_recursion/recursion_plugin.c 完整示例：汉诺塔（递归）
   plugins/<你的插件目录>/xxx.c
-  plugins_bin/                    编译产物存放处，自动生成
   Makefile
 ```
+
+两版都不用关心"插件怎么被平台发现"这件事：Python 版启动时扫描 `plugins/` 目录；C 版插件文件里有一句注册代码，编译进同一个可执行文件后在程序启动前自动生效。新增插件、改插件代码后，**重新运行一次（Python 直接重新运行，C 重新 `make`）就行**，不涉及任何动态库或运行时加载。
 
 `template/` 目录不会出现在插件菜单里，只有 `plugins/` 目录下的文件夹才会被自动加载——`template/` 专门留给你复制。
 
@@ -61,10 +65,9 @@ python3 main.py
 ### C 版
 ```bash
 cd platform-c
-make        # 编译核心程序，顺便把 plugins/ 下所有插件编译成 .so
-make run    # 编译并运行
+make run    # 把核心代码和所有插件一起编译成一个可执行文件，然后运行
 ```
-依赖 `gcc`、`make`。Linux/macOS 上 `dlopen` 是系统自带的。Windows 必须用 WSL，原生 Windows 没有 `dlopen`。
+依赖 `gcc`、`make`，装好编译器之后三大平台编译命令完全一样，不涉及动态库，Windows 装个 MinGW-w64 就能编译，不需要 WSL。
 
 ## 3. 插件接口
 
@@ -73,7 +76,7 @@ make run    # 编译并运行
 平台统一用纯文本做输入：输入框里的一整段文本，可以手打，也可以点"加载文本文件"从 `.txt` 读入。输出是 `run()` 返回的一整段文本，再加上可选的可视化画布。
 
 ```python
-from core.plugin_base import Plugin
+from plugin_base import Plugin
 
 class MyPlugin(Plugin):
     name = "我的插件名"      # 菜单里显示的名称，同一平台内不可重复
@@ -99,7 +102,7 @@ class MyPlugin(Plugin):
 
 #### 可视化工具（Python）
 
-`core/visual.py` 里的 `Visualizer` 只有三个方法，覆盖数据结构课最常见的三种画法：
+`visual.py` 里的 `Visualizer` 只有三个方法，覆盖数据结构课最常见的三种画法：
 
 ```python
 vis.draw_array([5, 3, 8, 1])                        # 数组方格，适合数组/顺序表/栈/队列
@@ -114,7 +117,7 @@ vis.draw_graph(["A", "B", "C"], [("A", "B"), ("B", "C")])   # 图：节点名字
 
 ### 3.2 C
 
-每个插件是一个独立的编译单元，导出一个函数：
+每个插件是一个独立的 `.c` 文件，和核心代码一起编译成同一个可执行文件：
 
 ```c
 #include <stdio.h>
@@ -134,27 +137,29 @@ static void run(void) {
 }
 
 static const PluginInfo info = {
-    .abi_version = PLUGIN_ABI_VERSION,
     .name = "我的插件名",
     .category = "E2",
     .description = "一句话说明输入格式",
     .run = run,
 };
 
-const PluginInfo *plugin_get_info(void) {
-    return &info;
+// __attribute__((constructor)) 让这个函数在 main() 之前自动执行，
+// 把插件信息注册进平台，不需要手动调用。
+static void __attribute__((constructor)) register_self(void) {
+    plugin_register(&info);
 }
 ```
 
 要点：
-- 文件放在 `plugins/<你的目录名>/`，`make` 会自动把该目录下所有 `.c` 编译成一个 `.so`。
+- 文件放在 `plugins/<你的目录名>/`，`Makefile` 会自动把该目录下所有 `.c` 一起编译进最终的可执行文件，不需要改 `Makefile`。
 - 统一用 `fgets` 读一整行文本，再自己解析（转成整数用 `atoi`，转成多个数字配合 `strtok`）。不要用 `scanf("%d", ...)`——它读完数字会在输入缓冲区留一个换行符，容易导致后面的读取出问题。
 - C 版 UI 是文本菜单，`run()` 里用 `fgets`/`printf` 和用户交互，不需要图形库。
 - 不要在插件里调用 `exit()`，会导致整个平台退出，而不是当前插件返回。
+- `register_self` 这个名字随便起，不同插件文件里重名没关系（都是 `static` 函数，只在各自文件内可见）；真正的插件名字是 `info.name`，这个不能和别人重复。
 
 #### 可视化工具（C）
 
-`include/visual.h` 是 header-only 的，`#include "visual.h"` 就能直接用，不用额外编译或链接：
+`visual.h` 是 header-only 的，`#include "visual.h"` 就能直接用，不用额外编译或链接：
 
 ```c
 vis_draw_array(values, n, highlight_index);   // 数组方格；highlight_index 传 -1 表示不高亮
@@ -180,11 +185,8 @@ vis_draw_graph_edges(edges_a, edges_b, edge_count);  // 图的邻接表文字画
 **Python：`name` 重复报错**
 插件名冲突会抛异常，给自己的插件起一个和示例插件、和同学都不重复的名字。
 
-**C：`make` 报 `undefined reference to dlopen`**
-确认 `Makefile` 里的 `LDFLAGS = -ldl` 没有被删掉。
-
 **C：插件没有出现在菜单里**
-先看 `make` 输出有没有编译错误，再看运行时 `[plugin_manager] 加载失败 ...` 的具体报错，多数是 `abi_version` 没设置、或 `plugin_get_info` 名字拼错。
+先看 `make` 输出有没有编译错误（最常见的是结构体字段名拼错）；如果编译通过但菜单里没有，检查插件文件里是不是漏了 `__attribute__((constructor))` 那个注册函数，或者文件没有放在 `plugins/<目录>/` 下面（`template/` 目录本身不会被编译进去）。
 
 **怎么表示数组、矩阵、树、图这类输入**
 全部用纯文本表示，平台不强制格式，每次实验的任务说明会给建议格式，比如矩阵每行一行、数字用逗号分隔，树用带占位符的层序序列。全班统一格式，方便用同一份 `.txt` 测试文件验收，写插件时把格式写进 `description`。
@@ -200,4 +202,4 @@ vis_draw_graph_edges(edges_a, edges_b, edge_count);  // 图的邻接表文字画
 
 ## 6. 提交要求
 
-提交 `plugins/<你的目录>/` 整个目录，不要提交没改过的 `core/`、`ui/`、`src/` 等平台文件。文件里保留简要说明，算法思路一两句话即可，复杂度分析写在 `description` 或注释里。
+提交 `plugins/<你的目录>/` 整个目录，不要提交没改过的平台核心文件。文件里保留简要说明，算法思路一两句话即可，复杂度分析写在 `description` 或注释里。

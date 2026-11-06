@@ -10,14 +10,13 @@
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 
-from core.registry import registry
-from core.visual import Visualizer
+from visual import Visualizer
 
 
 class PlatformApp(tk.Tk):
-    def __init__(self, reg=registry):
+    def __init__(self, plugins):
         super().__init__()
-        self.reg = reg
+        self.plugins = plugins
         self.title("数据结构实验插件平台（Python）")
         self.geometry("980x680")
         self.current_plugin = None   # 当前选中的插件对象
@@ -27,8 +26,12 @@ class PlatformApp(tk.Tk):
 
     def _build_menu(self):
         # 菜单栏：每个 category（比如 "E1"）是一个菜单，里面是这次课的所有插件
+        groups = {}
+        for p in sorted(self.plugins, key=lambda p: (p.category, p.name)):
+            groups.setdefault(p.category, []).append(p)
+
         menubar = tk.Menu(self)
-        for category, plugins in self.reg.by_category().items():
+        for category, plugins in groups.items():
             menu = tk.Menu(menubar, tearoff=0)
             for p in plugins:
                 # plugin=p 是 Python 的一个小技巧：让每个菜单项"记住"自己对应的插件
@@ -118,12 +121,3 @@ class PlatformApp(tk.Tk):
 
         self.output.delete("1.0", tk.END)
         self.output.insert(tk.END, result)
-
-
-def main():
-    app = PlatformApp()
-    app.mainloop()
-
-
-if __name__ == "__main__":
-    main()

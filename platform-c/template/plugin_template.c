@@ -2,7 +2,7 @@
  * 插件空白模板。
  *
  * 用法：把整个 template/ 目录复制到 plugins/ 下面，改个文件夹名字，
- * 再把下面几处 TODO 换成你自己的内容。
+ * 再把下面几处 TODO 换成你自己的内容，重新编译（make run）即可。
  *
  * 注意：这个目录本身不会被编译进插件——Makefile 只编译 plugins/ 目录下的
  * 文件夹，template/ 不在 plugins/ 里面，就是专门留给你复制用的。
@@ -29,13 +29,14 @@ static void run(void) {
 }
 
 static const PluginInfo info = {
-    .abi_version = PLUGIN_ABI_VERSION,
     .name = "我的插件",                      /* TODO：改成你的插件名字，别和同学的重复 */
     .category = "E2",                        /* TODO：改成对应的实验编号 */
     .description = "TODO：写一句话说明输入格式",
     .run = run,
 };
 
-const PluginInfo *plugin_get_info(void) {
-    return &info;
+/* __attribute__((constructor)) 让这个函数在 main() 之前自动执行，
+ * 把插件信息注册进平台——不需要手动调用，也不需要改任何核心文件。 */
+static void __attribute__((constructor)) register_self(void) {
+    plugin_register(&info);
 }

@@ -5,7 +5,7 @@
 比看 template/ 空模板更直观。
 """
 
-from core.plugin_base import Plugin
+from plugin_base import Plugin
 
 
 class SeqListInsertPlugin(Plugin):
