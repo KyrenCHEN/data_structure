@@ -42,13 +42,12 @@ static void run(void) {
 }
 
 static const PluginInfo info = {
-    .abi_version = PLUGIN_ABI_VERSION,
     .name = "汉诺塔求解（示例）",
     .category = "E1",
     .description = "输入一段文本形式的盘子数量 n，输出递归求解的完整移动步骤。",
     .run = run,
 };
 
-const PluginInfo *plugin_get_info(void) {
-    return &info;
+static void __attribute__((constructor)) register_self(void) {
+    plugin_register(&info);
 }

@@ -13,7 +13,7 @@
 
 **课堂 90 分钟**
 - 15 min：为什么要用插件架构做课程作业（对比"每次都重写 main 函数"的痛点）。
-- 25 min：讲解 `Plugin` 接口（Python）与 `PluginInfo` ABI（C）的字段含义，现场对照 `plugins/example_recursion` 逐行走读。
+- 25 min：讲解 `Plugin` 接口（Python）与 `PluginInfo` 结构体（C）的字段含义，现场对照 `plugins/example_recursion` 逐行走读。
 - 20 min：现场演示如何新增一个插件目录、注册、在 UI 里跑起来（用比汉诺塔更简单的"斐波那契数列"作为课堂示例，不布置为作业，避免与课后任务重复）。
 - 20 min：分发平台代码，学生在自己机器上跑通示例插件（环境搭建、编译工具链验证）。
 - 10 min：Q&A、答疑常见环境问题（Python 版本、gcc/make 是否可用）。

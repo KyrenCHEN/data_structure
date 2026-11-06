@@ -5,7 +5,7 @@
 不要直接修改本文件。
 """
 
-from core.plugin_base import Plugin
+from plugin_base import Plugin
 
 
 class HanoiPlugin(Plugin):

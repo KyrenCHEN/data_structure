@@ -6,7 +6,6 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/platform",
-            "args": ["plugins_bin"],
             "cwd": "${workspaceFolder}",
             "preLaunchTask": "编译平台和插件",
             "externalConsole": false,
