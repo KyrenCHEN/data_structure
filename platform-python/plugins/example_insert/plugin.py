@@ -10,7 +10,7 @@ from plugin_base import Plugin
 
 class SeqListInsertPlugin(Plugin):
     name = "顺序表插入（示例）"
-    category = "E2"
+    category = "E1"
     description = (
         "第一行：原数组，用逗号分隔，例如 3,5,8,2,9\n"
         "第二行：插入位置和插入值，用逗号分隔，例如 2,100（表示在下标 2 处插入 100）"
