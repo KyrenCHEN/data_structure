@@ -7,7 +7,7 @@
 - Python 平台：[`platform-python/`](platform-python/)
 - C 平台：[`platform-c/`](platform-c/)
 
-两版平台都带一个空白模板（`template/`，复制去写自己的插件）和两个完整示例：`plugins/example_insert`（顺序表插入，含可视化）、`plugins/example_recursion`（汉诺塔，不需要可视化）。
+两版平台都带一个空白模板（`template/`，复制去写自己的插件）和一个完整示例：`plugins/example_insert`（顺序表插入，含可视化）。
 
 ## 界面预览（Python 版）
 

@@ -26,4 +26,4 @@ python3 main.py
 插件接口规范、可视化工具用法、常见问题见 [`../docs/student_manual.md`](../docs/student_manual.md)。
 
 新插件从空白模板开始：[`template/plugin.py`](template/plugin.py)，复制到 `plugins/` 下改个名字即可。
-不知道代码该怎么写，先看完整示例：[`plugins/example_insert/plugin.py`](plugins/example_insert/plugin.py)（顺序表插入，含可视化）、[`plugins/example_recursion/plugin.py`](plugins/example_recursion/plugin.py)（汉诺塔，无需可视化）。
+不知道代码该怎么写，先看完整示例：[`plugins/example_insert/plugin.py`](plugins/example_insert/plugin.py)（顺序表插入，含可视化）。
