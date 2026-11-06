@@ -1,7 +1,7 @@
 """示例插件：汉诺塔（递归）。
 
-作为 E1.3 的参考实现，演示"文本输入 -> 文本输出"的最小写法。
-学生完成 E1.3 时应在 plugins/ 下新建自己的目录（如 plugins/hanoi_myname/），
+入门演示用，不是正式实验任务，演示"文本输入 -> 文本输出"的最小写法。
+想试着写自己的插件时在 plugins/ 下新建一个目录（如 plugins/hanoi_myname/），
 不要直接修改本文件。
 """
 
@@ -10,7 +10,7 @@ from plugin_base import Plugin
 
 class HanoiPlugin(Plugin):
     name = "汉诺塔求解（示例）"
-    category = "E1"
+    category = "E0"
     description = "输入一个正整数 n（盘子数量），例如 4。也可以点“加载文本文件”读取 sample_input.txt。"
 
     def example_input(self):

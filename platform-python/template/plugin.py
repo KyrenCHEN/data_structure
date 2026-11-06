@@ -13,7 +13,7 @@ from plugin_base import Plugin
 
 class MyPlugin(Plugin):
     name = "我的插件"            # TODO：改成你的插件名字，别和同学的重复
-    category = "E2"              # TODO：改成对应的实验编号，例如 "E2"
+    category = "E1"              # TODO：改成对应的实验编号，例如 "E1"
     description = "TODO：写一句话说明输入格式，例如“输入一行用逗号分隔的整数”"
 
     def example_input(self):

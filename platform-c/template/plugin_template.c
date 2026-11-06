@@ -30,7 +30,7 @@ static void run(void) {
 
 static const PluginInfo info = {
     .name = "我的插件",                      /* TODO：改成你的插件名字，别和同学的重复 */
-    .category = "E2",                        /* TODO：改成对应的实验编号 */
+    .category = "E1",                        /* TODO：改成对应的实验编号 */
     .description = "TODO：写一句话说明输入格式",
     .run = run,
 };

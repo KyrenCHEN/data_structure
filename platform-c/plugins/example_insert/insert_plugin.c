@@ -62,7 +62,7 @@ static void run(void) {
 
 static const PluginInfo info = {
     .name = "顺序表插入（示例）",
-    .category = "E2",
+    .category = "E1",
     .description = "依次输入原数组、插入位置和插入值，演示顺序表插入操作。",
     .run = run,
 };
