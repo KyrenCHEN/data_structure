@@ -16,6 +16,8 @@
 
 不知道代码应该写成什么样子，可以先看 `plugins/example_insert/`，这是一个完整实现的例子（顺序表插入），照着这个结构写就行。
 
+每次实验的要求是固定的，不设选做题；每次实验对应一个新插件、菜单里的一个新按钮。如果一次实验要求实现 2~3 个算法，这几个算法都写进同一个插件里，用输入的第一行写算法名（比如 `insert`）来区分走哪个分支，具体要求见 `course_design.md`。
+
 ## 1. 目录结构
 
 ```
@@ -26,7 +28,6 @@ platform-python/
   visual.py                       可视化工具
   template/plugin.py              空白模板，复制它去 plugins/ 下新建自己的插件
   plugins/example_insert/plugin.py     完整示例：顺序表插入
-  plugins/example_recursion/plugin.py  完整示例：汉诺塔（递归）
   plugins/<你的插件目录>/plugin.py
 
 platform-c/
@@ -37,7 +38,6 @@ platform-c/
   visual.h                        可视化工具，直接 #include 使用
   template/plugin_template.c      空白模板，复制它去 plugins/ 下新建自己的插件
   plugins/example_insert/insert_plugin.c       完整示例：顺序表插入
-  plugins/example_recursion/recursion_plugin.c 完整示例：汉诺塔（递归）
   plugins/<你的插件目录>/xxx.c
   Makefile
 ```
