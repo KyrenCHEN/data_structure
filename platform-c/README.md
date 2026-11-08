@@ -1,22 +1,15 @@
 # 数据结构实验插件平台（C 版）
 
-不熟悉命令行？用 VSCode 打开这个文件夹，按 `F5` 即可自动编译并运行，详见 [`../docs/vscode_setup.md`](../docs/vscode_setup.md)。
+环境安装、第一次运行看 [`../docs/getting_started.md`](../docs/getting_started.md)。命令行方式：
 
-命令行方式：
 ```bash
+cd platform-c
 make run
 ```
 
-依赖 `gcc`、`make`。Windows 装一个 MinGW-w64 编译器即可，不需要 WSL，三大平台编译命令完全一样。
+依赖 `gcc`、`make`。插件和核心代码一起编译成一个可执行文件，没有动态库、没有运行时加载；新增或改动插件后重新 `make run` 一次就行。
 
-插件和核心代码一起编译成一个可执行文件，没有动态库、没有运行时加载；新增或改动插件后重新 `make run` 一次就行。
-
-## 操作步骤
-
-1. 运行后会看到一个文本菜单，插件按实验编号连续排列，分类显示在插件名后面的括号里，如 `(E1)`。
-2. 输入插件前面的编号并回车进入该插件。
-3. 按插件的提示输入一行文本，回车确认，可视化结果和文字结果都直接打印在终端里。
-4. 回到菜单后输入 `0` 退出。
+运行起来之后是一个文字菜单，输入插件前面的编号进入，按提示输入一行文本，结果直接打印在终端里，`0` 退出：
 
 ```
 ============ 数据结构实验插件平台（C） ============
@@ -38,7 +31,7 @@ make run
 做法：把下标 2 开始的元素都往后移一位，腾出的位置放 100。
 ```
 
-插件接口规范、可视化工具用法、常见问题见 [`../docs/student_manual.md`](../docs/student_manual.md)。
+插件接口规范、怎么写自己的插件，看 [`../docs/student_manual.md`](../docs/student_manual.md)；平台内部原理看 [`../docs/architecture.md`](../docs/architecture.md)。
 
 新插件从空白模板开始：[`template/plugin_template.c`](template/plugin_template.c)，复制到 `plugins/` 下改个名字即可。
 不知道代码该怎么写，先看完整示例：[`plugins/example_insert/insert_plugin.c`](plugins/example_insert/insert_plugin.c)（顺序表插入，含可视化）。
