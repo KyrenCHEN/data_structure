@@ -4,7 +4,8 @@
 
 1. [`docs/getting_started.md`](docs/getting_started.md) —— 环境安装、第一次把平台跑起来，跟着做就行
 2. [`docs/student_manual.md`](docs/student_manual.md) —— 插件接口规范、怎么写自己的插件、常见问题
-3. [`docs/architecture.md`](docs/architecture.md) —— 平台内部原理，选读，写插件不需要看这篇
+3. [`docs/lab1.md`](docs/lab1.md) —— 实验一的具体任务：要做什么、输入输出格式、测试数据、提交要求
+4. [`docs/architecture.md`](docs/architecture.md) —— 平台内部原理，选读，写插件不需要看这篇
 
 其他文档：
 - 课程设计（每次课讲什么、布置什么任务、验收标准，给老师看的）：[`docs/course_design.md`](docs/course_design.md)
