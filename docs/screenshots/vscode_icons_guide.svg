@@ -1,0 +1,62 @@
+<svg viewBox="0 0 820 300" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,-apple-system,sans-serif">
+  <style>
+    .win{fill:#ffffff;stroke:#333333;stroke-width:1.2;}
+    .actbar{fill:#2c2c2c;}
+    .icon{fill:none;stroke:#cccccc;stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round;}
+    .icon-active{fill:none;stroke:#ffffff;stroke-width:1.8;stroke-linejoin:round;stroke-linecap:round;}
+    .active-bar{fill:#0a84ff;}
+    .toolbar{fill:#f3f3f3;stroke:#d9d9d9;stroke-width:1;}
+    .run-tri{fill:#2f8f4e;}
+    .lbl{font-size:15px;fill:#1a1a1a;font-weight:700;}
+    .sub{font-size:13px;fill:#444444;}
+    .callout{fill:none;stroke:#c0392b;stroke-width:2;}
+    .badge{fill:#c0392b;}
+    .badge-txt{font-size:13px;fill:#ffffff;font-weight:700;}
+  </style>
+
+  <rect x="10" y="10" width="800" height="200" rx="4" class="win"></rect>
+
+  <!-- activity bar -->
+  <rect x="10" y="10" width="48" height="200" class="actbar"></rect>
+  <path d="M22,34 h16 v6 h-16 z M22,44 h16 v6 h-16 z M22,54 h16 v6 h-16 z" class="icon"></path>
+  <circle cx="30" cy="84" r="6" class="icon"></circle>
+  <line x1="35" y1="89" x2="40" y2="94" class="icon"></line>
+  <circle cx="26" cy="112" r="2.4" class="icon"></circle>
+  <circle cx="26" cy="128" r="2.4" class="icon"></circle>
+  <circle cx="35" cy="120" r="2.4" class="icon"></circle>
+  <path d="M26,114 v12 M26,120 h9" class="icon"></path>
+  <circle cx="30" cy="150" r="7" class="icon"></circle>
+  <path d="M28,146 l6,4 l-6,4 z" class="icon" fill="#cccccc"></path>
+
+  <!-- extensions icon, highlighted -->
+  <rect x="8" y="172" width="42" height="28" fill="#0a84ff" opacity="0.18"></rect>
+  <rect x="7" y="172" width="4" height="28" class="active-bar"></rect>
+  <path d="M26,180 h5 v5 h-5 z M33,180 h5 v5 h5 v5 h-5 v5 h-5 v-5 h-5 v-5 h5 z" class="icon-active"></path>
+  <rect x="6" y="170" width="46" height="32" class="callout"></rect>
+  <circle cx="60" cy="155" r="11" class="badge"></circle>
+  <text x="60" y="160" text-anchor="middle" class="badge-txt">1</text>
+  <path d="M52,186 L58,164" class="callout"></path>
+
+  <!-- editor area -->
+  <rect x="58" y="10" width="752" height="30" class="toolbar"></rect>
+  <rect x="740" y="16" width="56" height="18" rx="3" fill="#ffffff" stroke="#333333" stroke-width="1.4"></rect>
+  <path d="M758,20 l10,5 l-10,5 z" class="run-tri"></path>
+  <rect x="738" y="14" width="60" height="22" class="callout"></rect>
+  <circle cx="768" cy="60" r="11" class="badge"></circle>
+  <text x="768" y="65" text-anchor="middle" class="badge-txt">2</text>
+  <path d="M768,36 L768,49" class="callout"></path>
+
+  <rect x="68" y="50" width="722" height="140" fill="#fafafa" stroke="#e5e5e5"></rect>
+  <text x="88" y="78" class="sub" fill="#999999">（这里是代码编辑区域）</text>
+
+  <!-- legend below the window -->
+  <circle cx="26" cy="238" r="11" class="badge"></circle>
+  <text x="26" y="243" text-anchor="middle" class="badge-txt">1</text>
+  <text x="46" y="234" class="lbl">扩展图标</text>
+  <text x="46" y="252" class="sub">左侧竖排图标最下面那个，四个方块拼在一起，点开能搜索安装扩展</text>
+
+  <circle cx="26" cy="276" r="11" class="badge"></circle>
+  <text x="26" y="281" text-anchor="middle" class="badge-txt">2</text>
+  <text x="46" y="272" class="lbl">运行按钮</text>
+  <text x="46" y="290" class="sub">编辑器右上角的绿色三角形，打开一个文件后点一下就是运行</text>
+</svg>
