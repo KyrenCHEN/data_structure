@@ -16,4 +16,4 @@ python3 main.py
 插件接口规范、怎么写自己的插件，看 [`../docs/student_manual.md`](../docs/student_manual.md)；平台内部原理看 [`../docs/architecture.md`](../docs/architecture.md)。
 
 新插件从空白模板开始：[`template/plugin.py`](template/plugin.py)，复制到 `plugins/` 下改个名字即可。
-不知道代码该怎么写，先看完整示例：[`plugins/example_insert/plugin.py`](plugins/example_insert/plugin.py)（顺序表插入，含可视化）。
+不知道代码该怎么写，先看完整示例：[`plugins/example_insert/plugin.py`](plugins/example_insert/plugin.py)（顺序表插入与删除，含可视化）。

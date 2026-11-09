@@ -10,7 +10,7 @@
 3. 重写 run(text, vis)：自己解析 text，执行算法，可选调用 vis 画图，最后 return 一段字符串。
 
 空白模板在 template/plugin.py，复制改名就能用；完整示例看
-plugins/example_insert/plugin.py（顺序表插入，含可视化）。
+plugins/example_insert/plugin.py（顺序表插入与删除，含可视化）。
 """
 
 
