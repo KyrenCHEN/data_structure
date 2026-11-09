@@ -17,8 +17,12 @@ Python 版和 C 版选一个就行，不用两个都装。拿不准选哪个：P
    - macOS：系统自带的 Python 版本太旧，去官网下载安装最新版。
    - Linux：发行版一般自带，终端执行 `python3 --version` 看看版本号够不够。
 2. 用 VSCode 打开 `platform-python` 这个文件夹（文件 → 打开文件夹，注意选的是这个子文件夹，不是整个仓库）。
-3. 右下角会提示装推荐的扩展，点"安装"（如果没弹出，去左侧扩展商店搜 `Python`，发布者 Microsoft，手动装）。
+3. 右下角会提示装推荐的扩展，点"安装"。如果没弹出，手动装：点左侧竖排图标里的扩展图标（下图①），搜 `Python`（发布者 Microsoft），点安装。
 4. 按 `Ctrl+Shift+P`（macOS 是 `Cmd+Shift+P`），输入 `Python: Select Interpreter`，选你刚装的 Python。
+
+没用过 VSCode、不认识这两个图标的话看这张图（扩展图标在左下角，运行按钮在编辑器右上角，下面 C 版也会用到）：
+
+![VSCode 扩展图标和运行按钮的位置](screenshots/vscode_icons_guide.svg)
 
 ### 选 C 版
 
@@ -35,7 +39,8 @@ Python 版和 C 版选一个就行，不用两个都装。拿不准选哪个：P
    > 找不到 `winget` 命令：Windows 10 1809 之后的版本都自带，更新一下 Windows 即可；实在不行就去 https://www.msys2.org/ 手动下载安装包，步骤跟着官网首页走。
 
 2. 用 VSCode 打开 `platform-c` 这个文件夹。
-3. 右下角提示装推荐扩展时点"安装"（或手动搜 `C/C++`，发布者 Microsoft）。
+3. 右下角提示装推荐扩展时点"安装"（或手动搜 `C/C++`，发布者 Microsoft，图标位置见上面那张图）。
+4. 打开任意一个 `.c` 文件时，VSCode 可能会弹出"选择编译器"（Select a Kit / Configure IntelliSense）的提示，列表里可能有好几个选项。这个跟实际编译没关系——我们用 `make` 编译，不依赖这个选择，随便选一个或者直接关掉提示都行；想消除代码里的红色波浪线提示，就选路径里带你刚才装的那个编译器（比如 `ucrt64\bin\gcc.exe`）的那一项。
 
 ## 第三步：运行起来
 
