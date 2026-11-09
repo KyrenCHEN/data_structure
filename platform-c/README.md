@@ -13,13 +13,14 @@ make run
 
 ```
 ============ 数据结构实验插件平台（C） ============
-  [1] 顺序表插入（示例） (E1)
+  [1] 顺序表插入与删除（示例） (E1)
   [0] 退出
 请输入编号: 1
 
--- 顺序表插入（示例） --
-依次输入原数组、插入位置和插入值，演示顺序表插入操作。
+-- 顺序表插入与删除（示例） --
+先输入 insert 或 delete 选择操作，再按提示输入数据。
 
+请输入操作（insert 或 delete）: insert
 请输入原数组，用逗号分隔（例如 3,5,8,2,9）: 3,5,8,2,9
 请输入插入位置和插入值，用逗号分隔（例如 2,100）: 2,100
 
@@ -34,4 +35,4 @@ make run
 插件接口规范、怎么写自己的插件，看 [`../docs/student_manual.md`](../docs/student_manual.md)；平台内部原理看 [`../docs/architecture.md`](../docs/architecture.md)。
 
 新插件从空白模板开始：[`template/plugin_template.c`](template/plugin_template.c)，复制到 `plugins/` 下改个名字即可。
-不知道代码该怎么写，先看完整示例：[`plugins/example_insert/insert_plugin.c`](plugins/example_insert/insert_plugin.c)（顺序表插入，含可视化）。
+不知道代码该怎么写，先看完整示例：[`plugins/example_insert/insert_plugin.c`](plugins/example_insert/insert_plugin.c)（顺序表插入与删除，含可视化）。
