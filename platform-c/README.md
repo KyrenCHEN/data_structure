@@ -32,7 +32,6 @@ make run
 做法：把下标 2 开始的元素都往后移一位，腾出的位置放 100。
 ```
 
-插件接口规范、怎么写自己的插件，看 [`../docs/student_manual.md`](../docs/student_manual.md)；平台内部原理看 [`../docs/architecture.md`](../docs/architecture.md)。
+插件接口规范和怎么写自己的插件看 [`../docs/student_manual.md`](../docs/student_manual.md)，平台内部原理看 [`../docs/architecture.md`](../docs/architecture.md)。
 
-新插件从空白模板开始：[`template/plugin_template.c`](template/plugin_template.c)，复制到 `plugins/` 下改个名字即可。
-不知道代码该怎么写，先看完整示例：[`plugins/example_insert/insert_plugin.c`](plugins/example_insert/insert_plugin.c)（顺序表插入与删除，含可视化）。
+新插件从空白模板 [`template/plugin_template.c`](template/plugin_template.c) 开始，复制到 `plugins/` 下改个名字。不知道代码该怎么写，看完整示例 [`plugins/example_insert/insert_plugin.c`](plugins/example_insert/insert_plugin.c)（顺序表插入与删除，含可视化）。

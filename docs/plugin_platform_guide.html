@@ -95,8 +95,8 @@ footer{padding:24px 0 40px;color:var(--muted);font-size:14px;}
   <div class="wrap">
     <h1>数据结构实验插件平台使用指南</h1>
     <p>
-      每次实验写的算法都封装成一个插件，运行在同一个平台上，不是一次性脚本。
-      这份文档说明平台怎么搭起来的、怎么跑起来、怎么写自己的第一个插件。
+      每次实验写的算法都封装成一个插件，运行在同一个平台上，不是写完就扔的一次性脚本。
+      这份文档讲平台是怎么搭起来的、怎么跑起来、第一个插件该怎么写。
     </p>
   </div>
 </header>
@@ -105,9 +105,9 @@ footer{padding:24px 0 40px;color:var(--muted);font-size:14px;}
   <div class="wrap">
     <h2>一、平台是怎么拼起来的</h2>
     <p>
-      核心程序只负责发现插件、渲染界面，不认识任何具体算法。插件通过统一接口挂进去：
-      Python 版启动时扫描 <code>plugins/</code> 目录；C 版编译时把 <code>plugins/</code>
-      下所有插件和核心代码一起编译进同一个可执行文件，没有动态库、没有运行时加载。
+      核心程序只管发现插件、渲染界面，不认识任何具体算法，插件靠统一接口挂进去。
+      Python 版启动时扫描 <code>plugins/</code> 目录；C 版在编译时就把 <code>plugins/</code>
+      下所有插件和核心代码编译进同一个可执行文件，不涉及动态库，也没有运行时加载。
     </p>
 
     <div class="diagram">
@@ -163,7 +163,7 @@ footer{padding:24px 0 40px;color:var(--muted);font-size:14px;}
         <text x="760" y="190" text-anchor="middle" class="sub">C</text>
       </svg>
     </div>
-    <p>核心部分（加载/注册、界面）由平台提供，学生不需要改；插件目录由学生各自新增，互不干扰。</p>
+    <p>加载/注册、界面这些核心部分由平台提供，学生不用改，自己新增的插件目录互不干扰。</p>
   </div>
 </section>
 
@@ -171,7 +171,7 @@ footer{padding:24px 0 40px;color:var(--muted);font-size:14px;}
   <div class="wrap">
     <h2>二、界面长什么样</h2>
     <p>
-      同一次课的插件放进同一个菜单。点开一个插件后，左侧出现说明和输入框，
+      同一次课的插件放进同一个菜单，点开一个插件，左侧会出现说明和输入框，
       中间上方是可视化画布，下方是文字输出框。
     </p>
 
@@ -234,8 +234,8 @@ footer{padding:24px 0 40px;color:var(--muted);font-size:14px;}
   <div class="wrap">
     <h2>三、跑起来</h2>
     <p>
-      不熟悉命令行用 VSCode 打开对应文件夹，Python 版点右上角的运行按钮，C 版按 F5，
-      效果和下面的命令一样，详见 <code>docs/getting_started.md</code>。
+      不熟悉命令行就用 VSCode 打开对应文件夹，Python 版点右上角的运行按钮，C 版按 F5，
+      跟下面的命令效果一样，详见 <code>docs/getting_started.md</code>。
     </p>
 
     <h3>Python 版</h3>
@@ -293,11 +293,11 @@ class BinarySearchPlugin(Plugin):
 <section id="timeline">
   <div class="wrap">
     <h2>五、五次实验的安排</h2>
-    <p>每次实验对应平台里新增的一个插件、一个新菜单项，课后任务固定 2~3 个算法，都写进同一个插件里（输入第一行写算法名区分分支），不设选做。第一次课把环境搭建并入实验一，内容刻意放轻。</p>
+    <p>每次实验对应平台里新增的一个插件、一个新菜单项。课后任务固定 2~3 个算法，都写进同一个插件（输入第一行写算法名区分分支），不设选做。第一次课把环境搭建并进实验一，内容故意放轻一点。</p>
 
     <table>
       <tr><th>实验</th><th>课堂讲什么</th><th>课后要写的算法（固定，不选做）</th></tr>
-      <tr><td>E1 环境搭建 + 顺序表</td><td>插件接口讲解，对照示例逐行走读</td><td>顺序表插入 + 顺序表删除</td></tr>
+      <tr><td>E1 环境搭建 + 线性表</td><td>插件接口讲解，对照示例逐行走读（示例是顺序表插入+删除）</td><td>单链表插入 + 单链表删除</td></tr>
       <tr><td>E2 栈和队列</td><td>典型应用场景、现场写括号匹配</td><td>栈（括号匹配）+ 循环队列</td></tr>
       <tr><td>E3 树</td><td>递归定义、三种遍历的写法规律</td><td>二叉树四种遍历 + 二叉查找树插入/查找</td></tr>
       <tr><td>E4 图</td><td>邻接矩阵 vs 邻接表、现场写 DFS</td><td>图的邻接表存储 + DFS/BFS</td></tr>
@@ -312,15 +312,15 @@ class BinarySearchPlugin(Plugin):
 
     <div class="qa">
       <p class="q">插件没有出现在菜单里怎么办？</p>
-      <p class="a">Python 版检查文件名是否严格为 <code>plugin.py</code>、类是否直接继承 <code>Plugin</code>；C 版先看 <code>make</code> 是否报编译错误，再检查插件文件里有没有漏写 <code>__attribute__((constructor))</code> 那个注册函数。</p>
+      <p class="a">Python 版先检查文件名是不是严格叫 <code>plugin.py</code>、类有没有直接继承 <code>Plugin</code>；C 版先看 <code>make</code> 有没有报编译错误，再检查插件文件是不是漏写了 <code>__attribute__((constructor))</code> 那个注册函数。</p>
     </div>
     <div class="qa">
       <p class="q">怎么表示数组、矩阵、树、图这类输入？</p>
-      <p class="a">全部用纯文本表示，平台不强制格式，每次实验的任务说明会给出建议格式，全班统一格式，便于批量验收。</p>
+      <p class="a">都用纯文本，平台不强制格式。每次实验的任务说明会给建议格式，全班统一，批量验收的时候方便。</p>
     </div>
     <div class="qa">
       <p class="q">C 版为什么是文本菜单，不是图形界面？</p>
-      <p class="a">C 原生做图形界面需要额外的 GUI 库，会把重心从数据结构挪到界面编程上。文本菜单同样能体现"插件独立编写、统一接口接入平台"这个核心概念，在 Windows/Linux/macOS 上零依赖运行。</p>
+      <p class="a">C 原生做图形界面得额外依赖 GUI 库，会把重心从数据结构挪到界面编程上。文本菜单一样能体现"插件独立编写、统一接口接入平台"这个核心概念，而且在 Windows/Linux/macOS 上零依赖运行。</p>
     </div>
     <div class="qa">
       <p class="q">提交时要交哪些文件？</p>
@@ -331,6 +331,6 @@ class BinarySearchPlugin(Plugin):
 
 <footer>
   <div class="wrap">
-    <p>完整接口规范与提交要求见仓库 <code>docs/student_manual.md</code>；平台内部原理见 <code>docs/architecture.md</code>；课程逐次教案见 <code>docs/course_design.md</code>。</p>
+    <p>完整接口规范和提交要求在仓库的 <code>docs/student_manual.md</code>，平台内部原理在 <code>docs/architecture.md</code>，课程逐次教案在 <code>docs/course_design.md</code>。</p>
   </div>
 </footer>

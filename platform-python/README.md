@@ -9,11 +9,10 @@ python3 main.py
 
 依赖 Python 3.10 及以上、标准库 `tkinter`，不需要 `pip install`。
 
-运行起来之后，顶部菜单栏按实验编号分组，点开菜单选一个插件，左侧填输入、点"运行"，结果和可视化显示在右侧：
+顶部菜单栏按实验编号分组，点开菜单选一个插件，左侧填输入、点"运行"，结果和可视化显示在右侧：
 
 ![运行顺序表插入示例后，画布显示数组方格、输出框显示文字结果](../docs/screenshots/python_ui_04_demo_visual.png)
 
-插件接口规范、怎么写自己的插件，看 [`../docs/student_manual.md`](../docs/student_manual.md)；平台内部原理看 [`../docs/architecture.md`](../docs/architecture.md)。
+插件接口规范和怎么写自己的插件看 [`../docs/student_manual.md`](../docs/student_manual.md)，平台内部原理看 [`../docs/architecture.md`](../docs/architecture.md)。
 
-新插件从空白模板开始：[`template/plugin.py`](template/plugin.py)，复制到 `plugins/` 下改个名字即可。
-不知道代码该怎么写，先看完整示例：[`plugins/example_insert/plugin.py`](plugins/example_insert/plugin.py)（顺序表插入与删除，含可视化）。
+新插件从空白模板 [`template/plugin.py`](template/plugin.py) 开始，复制到 `plugins/` 下改个名字。不知道代码该怎么写，看完整示例 [`plugins/example_insert/plugin.py`](plugins/example_insert/plugin.py)（顺序表插入与删除，含可视化）。
