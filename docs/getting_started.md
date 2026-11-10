@@ -34,7 +34,14 @@ Python 版和 C 版选一个装，不用两个都装。拿不准选哪个的话�
    | macOS（终端） | `xcode-select --install` |
    | Linux（终端） | `sudo apt install build-essential gdb` |
 
-   Windows 多一步：装完 MSYS2，打开开始菜单的 "MSYS2 UCRT64"，在它的窗口里跑 `pacman -S mingw-w64-ucrt-x86_64-gcc`，然后把安装路径下的 `ucrt64\bin` 加进系统环境变量 PATH（网上搜"windows 添加环境变量"就有步骤）。这一步做完就不用再管了。
+   Windows 多几步：装完 MSYS2，打开开始菜单的 "MSYS2 UCRT64"，在它的窗口里跑两条命令，一条装编译器，一条装 `make`（这两个是分开的包，gcc 不会自动带上 make）：
+   ```
+   pacman -S mingw-w64-ucrt-x86_64-gcc
+   pacman -S make
+   ```
+   注意第二条不要装成 `mingw-w64-ucrt-x86_64-make`——那个包装出来的命令叫 `mingw32-make`，不叫 `make`，我们这里的命令和 VSCode 配置认的都是字面上的 `make`，得装这个不带前缀的版本。
+
+   装完把两个目录都加进系统环境变量 PATH（网上搜"windows 添加环境变量"就有步骤）：`C:\msys64\ucrt64\bin`（放 gcc 的地方）和 `C:\msys64\usr\bin`（放 make 的地方），具体盘符看你装在哪。两条都加完，重新打开一个终端，跑 `gcc --version` 和 `make --version` 都能看到版本号，就说明装好了。这一步做完就不用再管了。
 
    > `winget` 命令找不到？Windows 10 1809 之后的版本都自带，更新一下系统就行；实在不行去 https://www.msys2.org/ 手动下安装包，跟着官网首页走。
 
@@ -75,7 +82,11 @@ C 版自始至终就是纯文本菜单，不是哪个版本漏做了界面。原
 
 ## 卡住了怎么办
 
-Python 提示找不到 `tkinter`，Linux 上比较常见，执行 `sudo apt install python3-tk` 再重新运行。C 版编译报错，先确认编译器真的装好了（终端跑 `gcc --version` 能看到版本号），没装好就回第二步重来，装好了再看 VSCode 终端里具体报的什么错。
+Python 提示找不到 `tkinter`，Linux 上比较常见，执行 `sudo apt install python3-tk` 再重新运行。
+
+C 版提示找不到 `make`（Windows 上常见）：说明只装了 gcc 没装 make，或者装的是 `mingw-w64-ucrt-x86_64-make`（命令叫 `mingw32-make`，对不上）。回第二步，装不带前缀的 `make` 包，把 `C:\msys64\usr\bin` 也加进 PATH。
+
+C 版其他编译报错，先确认编译器真的装好了（终端跑 `gcc --version` 和 `make --version` 都能看到版本号），没装好就回第二步重来，装好了再看 VSCode 终端里具体报的什么错。
 
 查了还是没头绪，找助教，别自己瞎猜太久。
 
