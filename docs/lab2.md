@@ -6,7 +6,7 @@
 
 两件事，封装进一个插件：中缀表达式求值（用栈），循环队列的入队出队。
 
-比实验一重一点。栈和队列各自配一个算法，表达式求值是这两个里更有分量的一个——支持加减乘除和括号，按优先级决定先算谁，用两个栈（一个存数字，一个存运算符）配合完成。循环队列的核心是正确处理队空、队满这两个边界，还有用取模实现"下标绕回去重新用"这个循环结构。
+比实验一重一点。表达式求值支持加减乘除和括号，按优先级决定先算谁，靠两个栈（一个存数字，一个存运算符）配合完成，这是两个算法里更费劲的那个。循环队列的坑主要在队空队满这两个边界，加上取模实现"下标绕回去重新用"那套逻辑。
 
 预计 2~3 小时。
 
@@ -14,9 +14,9 @@
 
 没跑起来平台的，看 [`getting_started.md`](getting_started.md)。不知道插件怎么写的，看 [`student_manual.md`](student_manual.md)。
 
-## 这次有个起始模板，不是空白的
+## 这次给的是半成品，不是空白模板
 
-跟实验一不一样，这次给你的不是空白 `template/`，是半成品 `lab2_starter`（Python 版 `platform-python/lab2_starter/plugin.py`，C 版 `platform-c/lab2_starter/stack_queue_plugin.c`）。
+实验一用的是空白 `template/`，这次换成半成品 `lab2_starter`（Python 版 `platform-python/lab2_starter/plugin.py`，C 版 `platform-c/lab2_starter/stack_queue_plugin.c`）。
 
 打开看一眼就知道：输入怎么读、数据结构怎么声明、大体流程是什么样，这些都写好了。真正的算法逻辑挖空了，标着 `TODO` 的地方就是要你自己填的：
 
