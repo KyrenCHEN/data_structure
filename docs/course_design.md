@@ -52,7 +52,7 @@
 
 比实验一重一点，学生版任务说明见 [`lab2.md`](lab2.md)。
 
-**课堂上给的起始模板**：`lab2_starter`（Python 版 `platform-python/lab2_starter/plugin.py`，C 版 `platform-c/lab2_starter/stack_queue_plugin.c`）。跟 `template/` 不一样，这个不是空白的——输入解析、数据结构骨架都搭好了，核心算法逻辑挖空成 TODO。两个算法封装进一个插件，输入第一行 `eval`/`queue` 区分，跟实验一的约定一样。
+**课堂上给的起始模板**：`lab2_starter`（Python 版 `platform-python/lab2_starter/plugin.py`，C 版 `platform-c/lab2_starter/stack_queue_plugin.c`）。这个不像 `template/` 那样空白，输入解析和数据结构骨架都搭好了，核心算法逻辑挖空成 TODO。两个算法封装进一个插件，输入第一行 `eval`/`queue` 区分，跟实验一的约定一样。
 
 课后任务：栈这边是中缀表达式求值（支持 `+ - * / ()`，比括号匹配更有分量，是这个主题最经典的进阶题）；队列这边是循环队列的入队/出队，重点是正确处理队空、队满这两个边界。
 
