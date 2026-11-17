@@ -4,7 +4,7 @@
 
 1. [`docs/getting_started.md`](docs/getting_started.md)：先把环境装好，跑一遍平台自带的示例，照着做就行。
 2. [`docs/student_manual.md`](docs/student_manual.md)：插件接口怎么写、常见问题都在这里。
-3. [`docs/lab1.md`](docs/lab1.md)：实验一要做什么、输入输出格式、测试数据、提交要求。
+3. [`docs/lab1.md`](docs/lab1.md)、[`docs/lab2.md`](docs/lab2.md)：各次实验要做什么、输入输出格式、测试数据、提交要求。
 4. [`docs/architecture.md`](docs/architecture.md)：平台内部是怎么运作的，选读，写插件用不上。
 
 其他文档：
